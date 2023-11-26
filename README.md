@@ -100,11 +100,11 @@ Installing Instruction:
 
 	You need to manual pip install the dependencies you need, here I provide all the command you may need.
 	
-```
+	```
  	pip install flask
  	pip install mysqlclient
 	pip install python-dotenv
- ```
+ 	```
     
 
 -------------------------------------------------------------------------
