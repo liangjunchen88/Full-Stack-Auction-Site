@@ -69,7 +69,8 @@ Installing Instruction:
 	```
 
  	Should be like this after step9 and step10
-	![image](https://github.com/liangjunchen88/Topics-of-Software/assets/113968753/2abe79d1-a135-4681-a7dc-dd55bdc5f8ad)
+	![image](https://github.com/liangjunchen88/Topics-of-Software/assets/113968753/23b72210-7868-4fcb-8640-2f315ab69bc9)
+
 
 12. Running the Application
 
