@@ -30,7 +30,7 @@ Installing Instruction:
 
 6. Open MySQL Shell
 	```
-	(venv) PS C:\Users\dell\auctionSite\gotham-auctions> mysqlsh
+	mysqlsh
 	```
 
 7. Enter SQL Mode
