@@ -103,7 +103,6 @@ Installing Instruction:
  	pip install flask
  	pip install mysqlclient
 	pip install python-dotenv
-        ```
     
 
 -------------------------------------------------------------------------
