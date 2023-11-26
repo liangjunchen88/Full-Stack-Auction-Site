@@ -26,6 +26,8 @@ Installing Instruction:
 5. Install Dependencies
 	```
 	pip3 install -r requirements.txt
+ 	// if pip3 doesn't work for you, try pip
+ 	pip install -r requirements.txt
 	```
 
 6. Open MySQL Shell
@@ -83,6 +85,8 @@ Installing Instruction:
 	3. Run the Application
 	```
 	python3 app.py
+ 	// if python3 doesn't work for you, try python
+ 	python app.py
 	```
 
  	4. Access the Web Application
@@ -105,7 +109,8 @@ Installing Instruction:
  	pip install mysqlclient
 	pip install python-dotenv
  	```
-    
+
+If you have father qs, plz reach out anytime on our team chat group ^_^
 
 -------------------------------------------------------------------------
 
