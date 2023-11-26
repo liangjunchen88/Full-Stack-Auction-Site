@@ -6,7 +6,7 @@ Installing Instruction:
    
 2. Navigate to local directory
 	```
-	cd C:\Users\dell\auctionSite\gotham-auctions
+	cd .\AuctionSite\
 	```
 
 3. Setting Up a Virtual Environment (Optional)
