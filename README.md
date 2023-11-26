@@ -7,7 +7,6 @@ Installing Instruction:
 2. Navigate to local directory
    ```
 	cd C:\Users\dell\auctionSite\gotham-auctions
-
    ```
 
 3. Setting Up a Virtual Environment (Optional)
@@ -32,10 +31,30 @@ Installing Instruction:
    ```
    
 7. Connect to Your Local Admin Account
-   ```
-   \connect root@localhost
-   ```
+```
+\connect root@localhost
+```
 
+8. Create and Set Up the New Database
+	```
+	CREATE DATABASE gotham;
+	USE gotham;
+	source ./database/gotham_db.sql;
+	```
+
+9. Create a .env File using IDE
+	Open your code editor or IDE (like Visual Studio Code, PyCharm, etc.).
+	Navigate to the gotham-auctions project folder.
+	Create a new file at the root of this folder and name it .env.
+
+10. Add Database Connection Details
+	In the .env file, you will add the lines provided, replacing placeholders with your actual database information. 
+	```
+	340DBHOST=localhost
+	340DBUSER=root
+	340DBPW=your_mysql_password
+	340DB=gotham
+	```
 
 -------------------------------------------------------------------------
 
