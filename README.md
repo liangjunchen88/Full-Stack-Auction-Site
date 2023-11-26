@@ -88,8 +88,22 @@ Installing Instruction:
  	4. Access the Web Application
 
       	Open your web browser and go to http://127.0.0.1:9112/.
+     
      	This is the local address where your Flask app is running.
+     
 	Flask will also output the URL in the terminal, confirming where the app is active.
+
+ 	Trouble Shooting:
+	
+	if you meet the any issue with the depencies like this:
+	![image](https://github.com/liangjunchen88/Topics-of-Software/assets/113968753/738615bb-075f-4a6c-bd25-44bfdf296c52)
+	You need to manual pip install the dependencies you need, here I provide all the command you may need:
+	
+	```
+ 	pip install flask
+ 	pip install mysqlclient
+	pip install python-dotenv
+        ```
     
 
 -------------------------------------------------------------------------
