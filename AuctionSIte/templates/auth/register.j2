@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class='container pt-5'>
+        <div class="row mt-2">
+            <div class="col">
+                <h2>Enter your details below to create an account!</h2>
+            </div>
+        </div>
+        <form method="POST">
+            <div class='row mt-5'>
+                <div class="col-4">
+                    <label for='fname' class="form-label">First Name</label>
+                    <input type='text' class="form-control" id='fname' name='fname'>
+                </div>
+                <div class="col-4">
+                    <label for='fname' class="form-label">Last Name</label>
+                    <input type='text' class="form-control" id='lname' name='lname'>
+                </div>
+            </div>
+            <div class='row mt-4'>
+                <div class="col-4">
+                    <label for='email' class="form-label">Email</label><br>
+                    <input type='email' class="form-control" id='email' name='email'>
+                </div>
+            </div>
+            <div class='row mt-4'>
+                <div class="col-4">
+                    <label for='user' class="form-label">Enter a Username:</label>
+                    <input type='text' class="form-control" id='user' name='user'>
+                </div>
+            </div>
+            <div class='row mt-4'>
+                <div class="col-4">
+                    <label for='pass' class="form-label">Enter a password:</label>
+                    <input type='password' class="form-control" id='pass' name='pass'>
+                </div>
+            </div>
+            <div class='row mt-4'>
+                <div class="col-4">
+                    <label for='pass-confirm' class="form-label">Confirm password:</label>
+                    <input type='password' class="form-control" id='pass-confirm' name='pass-confirm'>
+                </div> 
+            </div>
+            <div class='row my-4'>
+                <div class="col-4">
+                    <input type='submit' value='Create Account' class="btn btn-danger">
+                    <a class="btn btn-secondary" href="{{ url_for('auth.login') }}" role="button">Already a User?</a>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
