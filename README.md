@@ -45,9 +45,9 @@ Installing Instruction:
 
 9. Create and Set Up the New Database
 	```
-	CREATE DATABASE gotham;
-	USE gotham;
-	source ./database/gotham_db.sql;
+	CREATE DATABASE javaSavesUs;
+	USE javaSavesUs;
+	source ./database/javaSavesUs_db.sql;
 	```
 
 10. Create a .env File using IDE
@@ -65,7 +65,7 @@ Installing Instruction:
 	340DBHOST=localhost
 	340DBUSER=root
 	340DBPW=your_mysql_password
-	340DB=gotham
+	340DB=javaSavesUs
 	```
 
  	Should be like this after step9 and step10
