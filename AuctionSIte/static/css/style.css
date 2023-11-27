@@ -61,14 +61,14 @@ div.card {
 
 .favorite-button {
     position: absolute;
-    top: 10px;  /* 调整为所需的值 */
-    right: 10px; /* 调整为所需的值 */
-    background-color: white; /* 初始背景色为白色 */
+    top: 10px;
+    right: 10px;
+    background-color: white;
     border: none;
     cursor: pointer;
 }
 
 .favorite-button.active {
-    background-color: pink; /* 激活状态下的背景色 */
+    background-color: pink;
 }
 
