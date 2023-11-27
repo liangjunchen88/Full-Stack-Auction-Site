@@ -56,7 +56,7 @@ Installing Instruction:
 	
  	Open your code editor or IDE (like Visual Studio Code, PyCharm, etc.).
 
-	Navigate to the gotham-auctions project folder.
+	Navigate to the auction project folder.
 
 	Create a new file at the root of this folder and name it .env.
 
