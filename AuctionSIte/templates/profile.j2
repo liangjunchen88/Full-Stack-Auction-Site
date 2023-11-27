@@ -71,7 +71,7 @@
                     <tr>
                         <th scope='row'>{{ loop.index }}</th>
                         {# create row of relevant info #}
-                        <td>{{ listing.year }} {{ listing.make }} {{ listing.model }}</td>
+                        <td>{{ listing.name }}</td>
                         <td>{{ listing.bidAmt }}</td>
                         <td>{{ listing.reserve }}</td>
                         <td>{{ listing.expirationDate }}</td>
@@ -107,7 +107,7 @@
                     {% for bid in bid_history %}
                     <tr>
                         <th scope='row'>{{ bid.bidDate }}</th>
-                        <td>{{ bid.year }} {{ bid.make }} {{ bid.model }}</td>
+                        <td>{{ bid.name }}</td>
                         <td>{{ bid.bidAmt }}</td>
                     </tr>
                     {% endfor %}

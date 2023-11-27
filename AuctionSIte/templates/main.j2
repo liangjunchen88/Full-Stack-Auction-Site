@@ -29,24 +29,13 @@
                 {% endif %}
             {% endfor %}
                 <div class="card-body">
-                    <h4 class="card-title">{{item['year']}} {{item['make']}} {{item['model']}}</h4>
+                    <h4 class="card-title">{{item['name']}}</h4>
                     {% if item['reserve'] %}
-                    <h6 class="card-subtitle mb-2 text-muted">{{item['mileage']}} mi | Reserve: ${{item['reserve']}}</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">Reserve: ${{item['reserve']}}</h6>
                     {% else %}
-                    <h6 class="card-subtitle mb-2 text-muted">{{item['mileage']}} mi | Reserve: None</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">Reserve: None</h6>
                     {% endif %}
                     <p class="card-text">Features:</p>
-                    <ul>
-                    {% for listings_features in listings_features %}
-                        {% if item['listingID'] == listings_features['listingID']%}
-                            {% for carFeature in features %}
-                                {% if carFeature['featureID'] == listings_features['featureID'] %}
-                                    <li>{{carFeature['carFeature']}}</li>
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    {% endfor %}
-                    </ul>
                     <div class="card-footer bg-transparent">
                         {% if item['bidID'] %}
                             {% for bid in bids %}
