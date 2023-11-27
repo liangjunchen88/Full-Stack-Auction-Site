@@ -94,7 +94,7 @@ def submit_listing():
     #         make = manufacturers.readline().rstrip("\n")
 
     if request.method == "GET":
-        return render_template('submit_listing.j2', features=features, makes=makes, years=years)
+        return render_template('submit_listing.j2', features=features)
 
     if request.method == 'POST':
         data = request.form
