@@ -43,11 +43,8 @@ def register():
                 db_conn,
                 'INSERT INTO Users (userName, password, firstName, lastName, email, dateJoined) VALUES (%s, %s, %s, %s, %s, %s)',
                 (username, generate_password_hash(password), fname, lname, email, date_joined)
-                # storing hashed password for simplicity
-                # if no-hash preferred, directly insert password into query
             )
 
-            # add new userID to session and redirect to root
             user = db.execute_query(db_conn,
             'SELECT * FROM Users WHERE userName = %s',
             (username,)).fetchone()
@@ -77,11 +74,8 @@ def login():
 
         if user is None:
             error = 'Incorrect username.'
-        # elif user['password'] != password:
-        #     error = 'Incorrect password.'
         elif not check_password_hash(user['password'], password):
             error = 'Incorrect password.'
-        # if not hashing password, use commented out elif block
 
         if error is None:
             session.clear()

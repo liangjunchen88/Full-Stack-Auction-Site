@@ -10,7 +10,6 @@ UPLOAD_FOLDER = 'static/img/'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-# TODO: change to random bytes when deploying!
 app.config.from_mapping(SECRET_KEY='dev')
 app.register_blueprint(auth.bp)
 
@@ -55,7 +54,6 @@ def place_bid(list_id):
         bid_date = date.today()
         db_conn = db.connect_to_database()
 
-        # check if higher than current bid on listing
         query = "SELECT l.listingID, l.bidID, b.bidAmt as amount FROM Listings l INNER JOIN Bids b ON l.bidID = b.bidID WHERE l.listingID = %s;"
         high_bid = db.execute_query(db_connection=db_conn, query=query,
                                     query_params=(list_id,)).fetchone()
@@ -84,16 +82,16 @@ def place_bid(list_id):
 def submit_listing():
     # features, years and car makes needed in both GET and POST requests
     db_conn = db.connect_to_database()
-    query = "SELECT carFeature FROM Features;"
-    features = db.execute_query(db_connection=db_conn, query=query).fetchall()
-    makes = []
-    years = [_ for _ in range(date.today().year + 1, 1894, -1)]
+    # query = "SELECT carFeature FROM Features;"
+    # features = db.execute_query(db_connection=db_conn, query=query).fetchall()
+    # makes = []
+    # years = [_ for _ in range(date.today().year + 1, 1894, -1)]
     
-    with open('./static/misc/car_manufacturers.txt', 'r') as manufacturers:
-        make = manufacturers.readline().rstrip("\n")
-        while make != '':
-            makes.append(make)
-            make = manufacturers.readline().rstrip("\n")
+    # with open('./static/misc/car_manufacturers.txt', 'r') as manufacturers:
+    #     make = manufacturers.readline().rstrip("\n")
+    #     while make != '':
+    #         makes.append(make)
+    #         make = manufacturers.readline().rstrip("\n")
 
     if request.method == "GET":
         return render_template('submit_listing.j2', features=features, makes=makes, years=years)
@@ -107,11 +105,6 @@ def submit_listing():
             return render_template('submit_listing.j2', features=features, makes=makes, years=years)
 
         # validated, parse form and add listing
-        make = data['make']
-        model = data['model']
-        year = int(data['year'])
-        mileage = int(data['mileage'])
-        reserve = int(data['reserve']) if data['reserve'] != '' else 0
         list_date = date.today()
         expiration = data['expiration']
 
@@ -123,6 +116,7 @@ def submit_listing():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             photo.save(filepath)
 
+        # TODO: change to our fields
         query = "INSERT INTO Listings (userID, make, model, year, mileage, reserve, listDate, expirationDate) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
         cursor = db.execute_query(
             db_connection=db_conn, query=query, query_params=(g.user['userID'], make, model, year, mileage, reserve, list_date, expiration))
