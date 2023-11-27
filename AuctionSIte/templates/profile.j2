@@ -61,7 +61,7 @@
                         <th scope="col">#</th>
                         <th scope="col">Item</th>
                         <th scope="col">Current Bid</th>
-                        <th scope="col">Reserve</th>
+                        <th scope="col">Start Price</th>
                         <th scope="col">Expires</th>
                         <th scope="col">Actions</th>
                     </tr>
@@ -73,7 +73,7 @@
                         {# create row of relevant info #}
                         <td>{{ listing.name }}</td>
                         <td>{{ listing.bidAmt }}</td>
-                        <td>{{ listing.reserve }}</td>
+                        <td>{{ listing.startPrice }}</td>
                         <td>{{ listing.expirationDate }}</td>
                         {# hidden form for listing deletion #}
                         <td>

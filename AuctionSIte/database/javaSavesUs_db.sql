@@ -21,6 +21,7 @@ CREATE TABLE Listings (
     name VARCHAR(255) NOT NULL,
     userID INT(11),
     bidID INT(11),
+    discription VARCHAR(255) NOT NULL,
     listDate DATE NOT NULL,
     expirationDate DATE NOT NULL,
     PRIMARY KEY (listingID),
