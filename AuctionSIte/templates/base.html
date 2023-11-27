@@ -5,19 +5,25 @@
             <meta charset="UTF-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <!-- Bootstrap CSS -->
+
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
             {% block stylesheet %}
                 <link rel="stylesheet" href="/static/css/style.css">
                 <link rel="preconnect" href="https://fonts.gstatic.com">
                 <link href="https://fonts.googleapis.com/css2?family=Raleway&display=swap" rel="stylesheet">
+                <link href="https://fonts.googleapis.com/css2?family=Teko&display=swap" rel="stylesheet">
             {% endblock %}
-            {% block title %}<title>Gotham Auctions</title>{% endblock %}
+            {% block title %}<title>☕️ JavaSavesUs Auctions ☕️</title>{% endblock %}
         {% endblock %}
     </head>
     <body>
-        <nav class="navbar py-3 navbar-expand-lg navbar-dark bg-dark">
+        <nav class="navbar py-3 navbar-expand-lg navbar-dark custom-bg-color">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">Gotham Auctions</a>
+            <a class="navbar-brand" href="/">
+                <img src="/static/img/logo.png" alt="JavaSavesUs Logo" class="logo-img">
+                <span class="auction-text">Auction System</span>
+            </a>
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
