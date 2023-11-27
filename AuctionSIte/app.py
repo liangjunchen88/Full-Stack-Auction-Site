@@ -72,7 +72,7 @@ def place_bid(list_id):
 @app.route('/submit-listing', methods=['GET', 'POST'])
 @auth.login_required
 def submit_listing():
-    # features, years and car makes needed in both GET and POST requests
+
     db_conn = db.connect_to_database()
 
     if request.method == "GET":
