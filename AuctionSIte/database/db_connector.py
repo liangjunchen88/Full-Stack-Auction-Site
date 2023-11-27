@@ -1,4 +1,4 @@
-import MySQLdb
+import pymysql
 import os
 from dotenv import load_dotenv, find_dotenv
 
@@ -12,7 +12,10 @@ db = os.environ.get("340DB")
 
 def connect_to_database(host=host, user=user, passwd=passwd, db=db):
     
-    db_connection = MySQLdb.connect(host, user, passwd, db)
+    db_connection = pymysql.connect(host=host,
+                                    user=user,
+                                    password=passwd,
+                                    db=db)
     return db_connection
 
 
@@ -28,7 +31,7 @@ def execute_query(db_connection=None, query=None, query_params=()):
 
     print("Executing %s with %s" % (query, query_params))
    
-    cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor = db_connection.cursor(pymysql.cursors.DictCursor)
 
     cursor.execute(query, query_params)
     db_connection.commit()
@@ -47,7 +50,7 @@ def execute_many(db_connection=None, query=None, query_params=()):
 
     print("Executing %s with %s" % (query, query_params))
 
-    cursor = db_connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor = db_connection.cursor(pymysql.cursors.DictCursor)
 
     cursor.executemany(query, query_params)
     db_connection.commit()
