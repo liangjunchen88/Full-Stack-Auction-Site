@@ -18,14 +18,6 @@ app.register_blueprint(auth.bp)
 def root():
     db_conn = db.connect_to_database()
 
-    query = "SELECT featureID, carFeature FROM Features;"
-    features = db.execute_query(
-        db_connection=db_conn, query=query).fetchall()
-
-    query = "SELECT listingID, featureID FROM FeaturesListings;"
-    listings_features = db.execute_query(
-        db_connection=db_conn, query=query).fetchall()
-
     query = "SELECT bidID, bidAmt FROM Bids;"
     bids = db.execute_query(db_connection=db_conn, query=query).fetchall()
 
@@ -40,11 +32,11 @@ def root():
 
     elif request.method == 'POST':
         search_query = f"%{request.form['searchquery']}%"
-        query = "SELECT * FROM Listings WHERE listingID IN (SELECT listingID FROM (SELECT L.listingID, CONCAT_WS(' ', L.year, L.make, L.model, F.carFeature) AS carInfo FROM Listings L INNER JOIN FeaturesListings FL ON L.listingID = FL.listingID INNER JOIN Features F ON FL.featureID = F.featureID) AS tmp WHERE tmp.carInfo LIKE %s) AND userID IS NOT NULL AND expirationDate >= NOW();"
+        query = "SELECT * FROM Listings WHERE name LIKE %s AND userID IS NOT NULL AND expirationDate >= NOW();"
         listings = db.execute_query(db_connection=db_conn, query=query,
                                     query_params=(search_query,)).fetchall()
 
-    return render_template('main.j2', listings=listings, listings_features=listings_features, features=features, bids=bids, photos=photos)
+    return render_template('main.j2', listings=listings, bids=bids, photos=photos)
 
 
 @app.route('/place-bid/<int:list_id>', methods=['GET', 'POST'])
@@ -54,7 +46,7 @@ def place_bid(list_id):
         bid_date = date.today()
         db_conn = db.connect_to_database()
 
-        query = "SELECT l.listingID, l.bidID, b.bidAmt as amount FROM Listings l INNER JOIN Bids b ON l.bidID = b.bidID WHERE l.listingID = %s;"
+        query = "SELECT l.listingID, l.bidID, l.startPrice as startPrice, b.bidAmt as amount FROM Listings l LEFT JOIN Bids b ON l.bidID = b.bidID WHERE l.listingID = %s;"
         high_bid = db.execute_query(db_connection=db_conn, query=query,
                                     query_params=(list_id,)).fetchone()
 
@@ -82,16 +74,6 @@ def place_bid(list_id):
 def submit_listing():
     # features, years and car makes needed in both GET and POST requests
     db_conn = db.connect_to_database()
-    # query = "SELECT carFeature FROM Features;"
-    # features = db.execute_query(db_connection=db_conn, query=query).fetchall()
-    # makes = []
-    # years = [_ for _ in range(date.today().year + 1, 1894, -1)]
-    
-    # with open('./static/misc/car_manufacturers.txt', 'r') as manufacturers:
-    #     make = manufacturers.readline().rstrip("\n")
-    #     while make != '':
-    #         makes.append(make)
-    #         make = manufacturers.readline().rstrip("\n")
 
     if request.method == "GET":
         return render_template('submit_listing.j2')
@@ -102,67 +84,34 @@ def submit_listing():
 
         if error:
             flash(error, 'danger')
-            return render_template('submit_listing.j2', features=features, makes=makes, years=years)
+            return render_template('submit_listing.j2')
 
         # validated, parse form and add listing
+        name = data['name']
+        startPrice = data['startPrice']
+        description = data['description']
+        quantity = data['quantity']
+        shippingCosts = data['shippingCosts']
+
         list_date = date.today()
         expiration = data['expiration']
 
         # user photo stored at static/img/ otherwise default photo used
         photo = request.files['photo']
         filepath = "./static/img/No_image_available.jpg"
-        if validate_photo(photo): 
+        if validate_photo(photo):
             filename = secure_filename(photo.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             photo.save(filepath)
 
-        # TODO: change to our fields
-        query = "INSERT INTO Listings (userID, make, model, year, mileage, reserve, listDate, expirationDate) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
+        query = "INSERT INTO Listings (name, userID, listDate, expirationDate, startPrice, description, quantity, shippingCosts) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
         cursor = db.execute_query(
-            db_connection=db_conn, query=query, query_params=(g.user['userID'], make, model, year, mileage, reserve, list_date, expiration))
+            db_connection=db_conn, query=query, query_params=(name, g.user['userID'], list_date, expiration, startPrice, description, quantity, shippingCosts))
         list_id = cursor.lastrowid
 
         query = "INSERT INTO Photos (photoPath, listingID) VALUES (%s, %s);"
         db.execute_query(db_connection=db_conn, query=query,
                          query_params=(filepath, list_id))
-
-        # handling of features input
-        sel_features = request.form.getlist('features')  # selected features
-        usr_feature = request.form['usrfeature']  # feature inputted by user
-
-        # determine whether user creating already existing feature
-        if len(usr_feature) != 0:
-            query = "SELECT * FROM Features WHERE carFeature=%s"
-            feature_dups = db.execute_query(
-                db_connection=db_conn,
-                query=query,
-                query_params=(usr_feature,)).fetchall()
-
-            # no duplicate, add new feature
-            if len(feature_dups) == 0:
-                query = "INSERT INTO Features (carFeature) VALUES (%s);"
-                db.execute_query(
-                    db_connection=db_conn,
-                    query=query,
-                    query_params=(usr_feature,))
-                sel_features.append(usr_feature)
-            # duplicate, associate existing feature with new listing
-            else:
-                sel_features.append(feature_dups[0]['carFeature']) 
-
-        # add all features associated with listing into featuresListings
-        if len(sel_features) > 0:
-            format_str = ','.join(['%s'] * len(sel_features))
-            query = "SELECT featureID FROM Features WHERE carFeature IN (" + \
-                format_str + ");"
-            feature_ids = db.execute_query(db_connection=db_conn, query=query, query_params=tuple(sel_features)).fetchall()
-
-            # insert all feature ids for this listing
-            listing_features = [(list_id, feature_id['featureID'])
-                                for feature_id in feature_ids]
-            query = "INSERT INTO FeaturesListings (listingID, featureID) VALUES (%s, %s);"
-            db.execute_many(
-                db_connection=db_conn, query=query, query_params=listing_features)
 
         return redirect(url_for('root'))
 
@@ -176,14 +125,14 @@ def profile():
         # gather user's active listings
         user_id = (g.user['userID'], )
         query = \
-            "SELECT l.listingID, l.year, l.make, l.model, b.bidAmt, l.reserve, l.expirationDate FROM Listings l\
+            "SELECT l.listingID, b.bidAmt, l.expirationDate FROM Listings l\
             LEFT JOIN Bids b ON l.bidID = b.bidID \
             WHERE l.userID = %s;"
         active_listings = db.execute_query(db_conn, query, user_id)
 
         # gather user's bid history
         query = \
-            "SELECT b.bidDate, l.year, l.make, l.model, b.bidAmt FROM Bids b \
+            "SELECT b.bidDate, b.bidAmt FROM Bids b \
             INNER JOIN Listings l ON b.listingID = l.listingID \
             WHERE b.userID = %s;"
         bid_history = db.execute_query(db_conn, query, user_id)
@@ -194,10 +143,8 @@ def profile():
     elif request.method == "POST":
         # gather relevant data to delete listing
         listing_to_delete = request.form['listingID']
-        delete_query = 'DELETE FROM FeaturesListings WHERE listingID = %s;'
         update_query = 'UPDATE Listings SET Listings.userID = NULL WHERE listingID = %s;'
 
-        db.execute_query(db_conn, delete_query, (listing_to_delete,))
         db.execute_query(db_conn, update_query, (listing_to_delete,))
 
         return redirect(url_for('profile'))

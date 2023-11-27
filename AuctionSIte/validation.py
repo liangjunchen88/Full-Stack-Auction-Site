@@ -4,7 +4,7 @@ from datetime import date
 def validate_new_listing(form_data):
     """
     validates form data from submit_listing for required fields:
-        year, make, model, mileage, expiration
+         expiration
     param form_data -- information stored in request.form (dict)
     return error -- str or None
     """
@@ -16,23 +16,7 @@ def validate_new_listing(form_data):
     except:
         expiration_date = None
 
-    if not form_data['year'] or form_data['year'] == 'Select year':
-        error = "Please add a year to this listing."
-        print(error)
-        return error
-    elif not form_data['make'] or form_data['make'] == 'Select make':
-        error = "Please add a make to this listing."
-        print(error)
-        return error
-    elif not form_data['model']:
-        error = "Please add a model to this listing."
-        print(error)
-        return error
-    elif not form_data['mileage'] or int(form_data['mileage']) < 0:
-        error = "Please add an appropriate mileage to this listing."
-        print(error)
-        return error
-    elif not form_data['expiration'] or expiration_date is None or expiration_date <= today:
+    if not form_data['expiration'] or expiration_date is None or expiration_date <= today:
         error = "Please add an expiration date that is at least 1 day from today to this listing."
         print(error)
         return error
@@ -56,7 +40,13 @@ def validate_bid(user_bid, high_bid):
     return (validity, message) -- tuple of (False, str)
     """
     message = f"Congratulations! Your bid of ${user_bid} placed successfully."
-    if high_bid is not None and user_bid <= high_bid["amount"]:
+    if high_bid is None:
+        message = "Darn. wtf is going on..."
+        return False, message
+    if user_bid < high_bid["startPrice"]:
+        message = "Your bid should be higher than the start price! Try again."
+        return False, message
+    if high_bid["amount"] is not None and user_bid <= high_bid["amount"]:
         message = "Your bid is not high enough! Try again."
         return False, message
     return True, message
