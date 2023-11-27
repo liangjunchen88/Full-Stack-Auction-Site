@@ -8,6 +8,7 @@ CREATE TABLE Users (
     lastName VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     dateJoined DATE NOT NULL,
+	rating FLOAT,
     PRIMARY KEY (userID)
 );
 
@@ -21,15 +22,18 @@ CREATE TABLE Listings (
     name VARCHAR(255) NOT NULL,
     userID INT(11),
     bidID INT(11),
-    discription VARCHAR(255) NOT NULL,
     listDate DATE NOT NULL,
     expirationDate DATE NOT NULL,
+	startPrice INT(11) NOT NULL,
+	description VARCHAR(255),
+	quantity INT(11) NOT NULL,
+	shippingCosts INT(11) NOT NULL,
     PRIMARY KEY (listingID),
     FOREIGN KEY (userID) REFERENCES Users(userID)
 );
 
-INSERT INTO Listings (name, userID, bidID, listDate, expirationDate) VALUES
-    ('dummy item',1, NULL, '2020-04-04', '2022-06-06');
+INSERT INTO Listings (name, userID, bidID, listDate, expirationDate, startPrice, description, quantity, shippingCosts) VALUES
+    ('dummy item',1, NULL, '2020-04-04', '2022-06-06', 9900, 'sus', 10, 5);
 DROP TABLE IF EXISTS Bids;
 
 CREATE TABLE Bids (
