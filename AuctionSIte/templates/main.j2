@@ -12,7 +12,7 @@
                 <div class="row-4 input-group">
                     <input type="search" class="form-control" name="searchquery" placeholder="Search listings by year, make, model, or feature">
                     <div class="input-group-append">
-                        <button type="submit" class="btn btn-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg></button>
+                        <button type="submit" class="btn main-button"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search main-icon" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg></button>
                     </div>
                 </div>
             </div>
@@ -25,7 +25,15 @@
             <div class="card h-100">
             {% for photo in photos %}
                 {% if photo['listingID'] == item['listingID'] %}
+                    <div class="image-container">
                     <img src="{{photo['photoPath']}}" class="card-img-top" alt="...">
+                    <button class="btn favorite-button" onclick="toggleFavorite(this)">&#x2764;</button> <!-- 收藏按钮 -->
+                    <script>
+                    function toggleFavorite(button) {
+                        button.classList.toggle('active');
+                    }
+                    </script>
+                    </div>
                 {% endif %}
             {% endfor %}
                 <div class="card-body">
@@ -52,7 +60,7 @@
                         <div class="col-auto input-group w-75">
                             <input type="number" class="form-control" name="bid" id="bid" placeholder="ex. 25000">
                             <div class="input-group-append">
-                                <input type="submit" class="btn btn-primary" value="Place Bid">
+                                <input type="submit" class="btn main-button" value="Place Bid">
                             </div>
                         </div>
                     </form>
@@ -64,3 +72,4 @@
     </div>
 </div>
 {% endblock %}
+
