@@ -121,7 +121,7 @@ CREATE TABLE ShoppingcartRecords (
                             shoppingcartRecordID INT(11) UNIQUE NOT NULL AUTO_INCREMENT,
                             userID INT(11),
                             listingID INT(11),
-                            deal_Price DECIMAL(10,2) NOT NULL,
+                            dealPrice DECIMAL(10,2) NOT NULL,
                             PRIMARY KEY (shoppingcartRecordID),
                             FOREIGN KEY (userID) REFERENCES Users(userID),
                             FOREIGN KEY (listingID) REFERENCES Listings(listingID)
