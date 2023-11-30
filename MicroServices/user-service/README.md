@@ -1,5 +1,3 @@
-Here's a template for a `README.md` file for your `user-service`, including an API Specification section:
-
 # User Service
 
 User Service is a backend microservice built with Flask. It provides APIs for user registration, login, profile management, and listing related operations.
