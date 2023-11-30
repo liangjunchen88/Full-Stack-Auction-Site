@@ -1,55 +1,65 @@
 from flask import Flask, request, jsonify
-import mysql.connector
-from mysql.connector import Error
+from flask_cors import CORS
+import os
+import database.db_connector as db
 
+# Set up upload folder
+UPLOAD_FOLDER = 'static/img/'
+
+# Initialize Flask app
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config.from_mapping(SECRET_KEY='dev')
+CORS(app)  # Enable CORS
 
-def create_connection():
-    """Create a database connection."""
-    connection = None
-    try:
-        connection = mysql.connector.connect(
-            host='localhost',
-            user='username',
-            password='password',
-            database='database'
-        )
-    except Error as e:
-        print(f"The error '{e}' occurred")
-    return connection
+# Route to display all listings
+@app.route('/listings', methods=['GET'])
+def get_listings():
+    db_conn = db.connect_to_database()
 
-@app.route('/add_shopping_cart', methods=['POST'])
-def add_shopping_cart():
-    """Add item to shopping cart."""
-    data = request.json
-    connection = create_connection()
-    cursor = connection.cursor()
+    # Update the query to join the Listings, Photos, and Bids tables
+    query = """
+    SELECT 
+        Listings.*, 
+        Photos.photoPath,
+        Bids.bidAmt
+    FROM 
+        Listings 
+    LEFT JOIN 
+        Photos ON Listings.listingID = Photos.listingID
+    LEFT JOIN 
+        Bids ON Listings.bidID = Bids.bidID
+    WHERE 
+        Listings.userID IS NOT NULL AND Listings.endDate >= NOW();
+    """
 
-    user_id = data['user_id']
-    item_id = data['item_id']
-    price = data['price']
+    listings = db.execute_query(db_connection=db_conn, query=query).fetchall()
+    return jsonify({'success': True, 'data': listings})
 
-    query = "INSERT INTO shopping_cart (user_id, item_id, price) VALUES (%s, %s, %s)"
-    cursor.execute(query, (user_id, item_id, price))
-    connection.commit()
 
-    return jsonify({"message": "Item added to shopping cart"}), 201
+# Route for searching listings
+@app.route('/search', methods=['POST'])
+def search_listings():
+    search_query = request.json['searchquery']
+    db_conn = db.connect_to_database()
+    query = """
+    SELECT 
+        Listings.*, 
+        Photos.photoPath
+    FROM 
+        Listings 
+    LEFT JOIN 
+        Photos ON Listings.listingID = Photos.listingID
+    WHERE 
+        Listings.name LIKE %s AND 
+        Listings.userID IS NOT NULL AND 
+        Listings.endDate >= NOW();
+    """
+    listings = db.execute_query(db_connection=db_conn, query=query, query_params=(f"%{search_query}%",)).fetchall()
+    return jsonify({'success': True, 'data': listings})
 
-@app.route('/add_watchlist', methods=['POST'])
-def add_watchlist():
-    """Add item to watchlist."""
-    data = request.json
-    connection = create_connection()
-    cursor = connection.cursor()
 
-    user_id = data['user_id']
-    item_id = data['item_id']
-
-    query = "INSERT INTO watchlist (user_id, item_id) VALUES (%s, %s)"
-    cursor.execute(query, (user_id, item_id))
-    connection.commit()
-
-    return jsonify({"message": "Item added to watchlist"}), 201
-
-if __name__ == '__main__':
-    app.run(debug=True)
+# Run listener
+if __name__ == "__main__":
+    port = int(os.environ.get('PORT', 9991))
+    app.run(port=port, debug=True, host='0.0.0.0')

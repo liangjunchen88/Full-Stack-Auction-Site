@@ -50,7 +50,7 @@ CREATE TABLE Bids (
 ALTER TABLE Listings
 ADD FOREIGN KEY (bidID) REFERENCES Bids(bidID);
 
-INSERT INTO Bids (userID, listingID, bidAmt, bidDate) VALUES 
+INSERT INTO Bids (userID, listingID, bidAmt, bidDate) VALUES
     (1, 1, 20000, '2023-11-15');
 
 UPDATE Listings SET bidID = 1 WHERE listingID = 1;
