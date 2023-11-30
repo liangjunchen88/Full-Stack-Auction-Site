@@ -36,8 +36,8 @@ def check_expired_listings():
 
         print(f"Expired listing: {listing}")
 
-# Schedule the job to run every minute
-schedule.every(3).seconds.do(check_expired_listings)
+# Schedule the job to run every 5 seconds
+schedule.every(5).seconds.do(check_expired_listings)
 
 # Infinite loop to run the scheduler
 while True:
