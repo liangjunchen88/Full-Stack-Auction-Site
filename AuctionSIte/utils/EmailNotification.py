@@ -18,7 +18,7 @@ receiver_email = 'shuhuilin@uchicago.edu'
 
 def notify(receiver_email):
     subject = "wasssssssup!"
-    body = "welp nothing here.."
+    body = "It's a prank lol"
 
     em = EmailMessage()
     em['From'] = SENDER

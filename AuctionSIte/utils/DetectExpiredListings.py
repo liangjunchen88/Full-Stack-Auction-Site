@@ -32,7 +32,7 @@ def check_expired_listings():
 
         # TODO: add the item to the winner's shopping cart
 
-        # TODO(optional): modify some tables if needed
+        # TODO(optional): update some tables if necessary
 
         print(f"Expired listing: {listing}")
 
