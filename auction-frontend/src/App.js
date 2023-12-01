@@ -1,0 +1,40 @@
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import './static/css/style.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min';
+
+import Listings from './components/Home';
+import Register from './components/Register';
+import Login from "./components/Login";
+import Navbar from './components/Navbar';
+import Profile from "./components/Profile";
+
+function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState({});
+
+  const handleLogin = (userData) => {
+    setIsLoggedIn(true);
+    setUser(userData.user);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setUser({});
+  };
+
+  return (
+    <Router>
+      <Navbar isLoggedIn={isLoggedIn} user={user} onLogout={handleLogout} />
+      <Routes>
+        <Route path="/" element={<Listings />} />
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/profile" element={<Profile user={user} />} />
+        {/* other routes */}
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
