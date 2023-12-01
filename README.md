@@ -2,11 +2,18 @@
 
 Installing Instruction:
 
-1. Clone to your local
-   
-2. Navigate to local directory
+1. Download and install Node.js
+	https://nodejs.org/en/download/
+	after install, check
 	```
-	cd .\AuctionSite\
+	node -v
+	npm -v
+	```
+   
+2. Navigate to auction-frontend
+	```
+	cd .\auction-frontend\
+	npm install
 	```
 
 3. Setting Up a Virtual Environment (Optional)
@@ -47,6 +54,7 @@ Installing Instruction:
 
 9. Create and Set Up the New Database
 	```
+	DROP DATABASE javaSavesUs;
 	CREATE DATABASE javaSavesUs;
 	USE javaSavesUs;
 	source ./database/javaSavesUs_db.sql;
@@ -56,7 +64,7 @@ Installing Instruction:
 	
  	Open your code editor or IDE (like Visual Studio Code, PyCharm, etc.).
 
-	Navigate to the auction project folder.
+	Navigate to each MircroService folder.
 
 	Create a new file at the root of this folder and name it .env.
 
@@ -83,10 +91,15 @@ Installing Instruction:
 	2. Activate Your Virtual Environment (If You Used One)
 	
 	3. Run the Application
+	split into 5 terminals
 	```
-	python3 app.py
- 	// if python3 doesn't work for you, try python
- 	python app.py
+	python .\MicroServices\auction-service\app_auction.py
+	python .\MicroServices\item-service\app_item.py
+	python .\MicroServices\rating-service\app_rating.py
+	python .\MicroServices\user-service\app_user.py
+
+	cd .\auction-frontend\
+	npm start
 	```
 
  	4. Access the Web Application
@@ -108,6 +121,8 @@ Installing Instruction:
  	pip install flask
  	pip install mysqlclient
 	pip install python-dotenv
+	pip install flask-cors
+	pip install pymysql
  	```
 
 If you have father qs, plz reach out anytime on our team chat group ^_^

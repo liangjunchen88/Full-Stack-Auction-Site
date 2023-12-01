@@ -11,16 +11,11 @@ db = os.environ.get("340DB")
 
 
 def connect_to_database(host=host, user=user, passwd=passwd, db=db):
-    
-    db_connection = pymysql.connect(host=host,
-                                    user=user,
-                                    password=passwd,
-                                    db=db)
+    db_connection = pymysql.connect(host=host, user=user, password=passwd, db=db)
     return db_connection
 
 
 def execute_query(db_connection=None, query=None, query_params=()):
-
     if db_connection is None:
         print("No connection to the database found! Have you called connect_to_database() first?")
         return None
@@ -30,16 +25,14 @@ def execute_query(db_connection=None, query=None, query_params=()):
         return None
 
     print("Executing %s with %s" % (query, query_params))
-   
-    cursor = db_connection.cursor(pymysql.cursors.DictCursor)
 
+    cursor = db_connection.cursor(pymysql.cursors.DictCursor)
     cursor.execute(query, query_params)
     db_connection.commit()
     return cursor
 
 
 def execute_many(db_connection=None, query=None, query_params=()):
-
     if db_connection is None:
         print("No connection to the database found! Have you called connect_to_database() first?")
         return None
@@ -51,7 +44,6 @@ def execute_many(db_connection=None, query=None, query_params=()):
     print("Executing %s with %s" % (query, query_params))
 
     cursor = db_connection.cursor(pymysql.cursors.DictCursor)
-
     cursor.executemany(query, query_params)
     db_connection.commit()
     return cursor
@@ -59,9 +51,9 @@ def execute_many(db_connection=None, query=None, query_params=()):
 
 if __name__ == '__main__':
     print("Executing a sample query on the database using the credentials from db_credentials.py")
-    db = connect_to_database()
+    db_connection = connect_to_database()
     query = "SELECT * from Users;"
-    results = execute_query(db, query)
+    results = execute_query(db_connection, query)
     print("Printing results of %s" % query)
 
     for r in results.fetchall():

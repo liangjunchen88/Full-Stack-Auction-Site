@@ -3,14 +3,12 @@ from flask_cors import CORS
 from decimal import Decimal, InvalidOperation, ROUND_DOWN
 from datetime import datetime
 from werkzeug.utils import secure_filename
-
 import json
 import os
-import database.db_connector as db
+from database import db_connector as db
 
 # Set up upload folder
 UPLOAD_FOLDER = 'static/img/'
-
 # Initialize Flask app
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -158,8 +156,8 @@ def submit_listing():
         description = data['description']
         quantity = data['quantity']
         shippingCosts = process_price(data['shippingCosts'])
-        numFlagged = 0;
-        status = "active";
+        numFlagged = 0
+        status = "active"
 
         # user photo stored at static/img/ otherwise default photo used
         # photo = request.files['photo']
@@ -322,6 +320,7 @@ def categorize_listing():
 
         return jsonify({'success': True, 'message': "your item has been categorized"}), 200
 
+# TODO: Build whatchList frontEnd
 @app.route('/add-watchlist', methods=['POST'])
 def add_watchlist():
     db_conn = db.connect_to_database()
