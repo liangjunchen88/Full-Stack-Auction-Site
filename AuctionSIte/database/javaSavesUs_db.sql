@@ -8,7 +8,7 @@ CREATE TABLE Users (
     lastName VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     dateJoined DATE NOT NULL,
-	rating DECIMAL(10,1) NOT NULL,
+	ratingScore DECIMAL(10,1) NOT NULL,
 	isActive BOOL NOT NULL,
 	isAdmin BOOL NOT NULL,
     PRIMARY KEY (userID)
