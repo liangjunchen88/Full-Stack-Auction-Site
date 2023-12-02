@@ -1,4 +1,6 @@
 import uuid
+
+import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from decimal import Decimal, InvalidOperation, ROUND_DOWN
@@ -266,6 +268,32 @@ def submit_listing():
         db.execute_query(db_connection=db_conn, query=query,
                          query_params=(filepath, list_id))
 
+        # notify users who might be interested in this newly added item
+        query = """
+            SELECT
+                DISTINCT u.email
+            FROM
+                 Users u
+            JOIN
+                Watchlists w ON u.userID = w.userID
+            WHERE
+                %s BETWEEN w.lowerPrice AND w.upperPrice
+                AND %s LIKE CONCAT('%%', w.keyword, '%%');
+        """
+
+        email_listing = db.execute_query(db_connection=db_conn, query=query, query_params=(startPrice, name)).fetchall()
+        notify_url = "http://localhost:9993/notice"
+        headers = {"Content-Type": "application/json"}
+        for email_dict in email_listing:
+            msg = "We found an item you might be interested in: {}".format(name)
+            data = {"msg": msg, "receiver": email_dict['email']}
+            response = requests.post(notify_url, headers=headers, json=data)
+            if response.status_code == 200:
+                print("notification sent successful!")
+                print("Response content:", response.content.decode())
+            else:
+                print("notification failed with status code:", response.status_code)
+
         return jsonify({'success': True, 'listingID': list_id}), 200
 
 
@@ -472,7 +500,6 @@ def categorize_listing():
         return jsonify({'success': True, 'message': "your item has been categorized"}), 200
 
 
-# TODO: Build whatchList frontEnd
 @app.route('/add-watchlist', methods=['POST'])
 def add_watchlist():
     db_conn = db.connect_to_database()
