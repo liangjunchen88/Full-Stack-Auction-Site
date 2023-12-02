@@ -17,6 +17,7 @@ function StarRating({ rating }) {
 
 function Profile({ user }) {
   const [activeListings, setActiveListings] = useState([]);
+  const [shoppingCart, setShoppingCart] = useState([]);
   const [bidHistory, setBidHistory] = useState([]);
   const [userInfo, setUserInfo] = useState([]);
   const [activeUsers, setActiveUsers] = useState([]);
@@ -46,14 +47,21 @@ function Profile({ user }) {
       })
       .catch((error) => console.log(error));
 
-    axios.get(`${config.userServiceUrl}/user/${user.id}/active-users`)
-        .then(response => {
+    axios
+      .get(`${config.userServiceUrl}/user/${user.id}/active-users`)
+      .then((response) => {
         if (response.data.success) {
-            setActiveUsers(response.data.data);
+          setActiveUsers(response.data.data);
         }
-        })
-        .catch((error) => console.log(error));
+      })
+      .catch((error) => console.log(error));
 
+    axios
+      .get(`${config.userServiceUrl}/user/${user.id}/shopping-cart`)
+      .then((response) => {
+        setShoppingCart(response.data.data);
+      })
+      .catch((error) => console.log(error));
   }, [user, user.id]);
 
   if (!userInfo) {
@@ -186,58 +194,98 @@ function Profile({ user }) {
         </table>
       </div>
 
-      <div className="mt-5">
-        <h4 style={{ color: "maroon" }}>Bid History</h4>
-        <table className="table table-striped table-hover">
-          <thead>
-            <tr>
-              <th>Date Placed</th>
-              <th>Item</th>
-              <th>Bid Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bidHistory.map((bid) => (
-              <tr key={bid.bidID}>
-                <td>{new Date(bid.bidDate).toLocaleDateString()}</td>
-                <td>{bid.name}</td>
-                <td>{bid.bidAmt}</td>
+      {/* Bid history Table - Only render for normal users */}
+      {!user.isAdmin && (
+        <div className="mt-5">
+          <h4 style={{ color: "maroon" }}>Bid History</h4>
+          <table className="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Date Placed</th>
+                <th>Item</th>
+                <th>Bid Amount</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {bidHistory.map((bid) => (
+                <tr key={bid.bidID}>
+                  <td>{new Date(bid.bidDate).toLocaleDateString()}</td>
+                  <td>{bid.name}</td>
+                  <td>{bid.bidAmt}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      <div className="mt-5">
-        <h4 style={{ color: "maroon" }}>User Management</h4>
-        <table className="table table-striped table-hover">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>User</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Date Joined</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {activeUsers.map((user, index) => (
-              <tr key={user.userID}>
-                <th scope="row">{index + 1}</th>
-                <td>{user.userName}</td>
-                <td>{user.firstName}</td>
-                <td>{user.lastName}</td>
-                <td>{new Date(user.dateJoined).toLocaleDateString()}</td>
-                <td>
-                  {/* opration button */}
-                  <button className="btn btn-danger">Cancel</button>
-                </td>
+      {/* User Management Table - Only render if user is an admin */}
+      {user.isAdmin && (
+        <div className="mt-5">
+          <h4 style={{ color: "maroon" }}>User Management</h4>
+          <table className="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>User</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Date Joined</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {activeUsers.map((user, index) => (
+                <tr key={user.userID}>
+                  <th scope="row">{index + 1}</th>
+                  <td>{user.userName}</td>
+                  <td>{user.firstName}</td>
+                  <td>{user.lastName}</td>
+                  <td>{new Date(user.dateJoined).toLocaleDateString()}</td>
+                  <td>
+                    {/* operation button */}
+                    <button className="btn btn-danger">Delete</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Shopping Cart Table - Only render for normal users */}
+      {!user.isAdmin && (
+        <div className="mt-5">
+          <h4 style={{ color: "maroon" }}>Shopping Cart</h4>
+          <table className="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Item</th>
+                <th>Current Bid</th>
+                <th>Start Price</th>
+                <th>Expires</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {shoppingCart.map((listing, index) => (
+                <tr key={listing.listingID}>
+                  <th>{index + 1}</th>
+                  <td>{listing.name}</td>
+                  <td>{listing.bidAmt}</td>
+                  <td>{listing.startPrice}</td>
+                  <td>{new Date(listing.endDate).toLocaleDateString()}</td>
+                  <td>
+                    {/* opration button */}
+                    <button className="btn btn-danger">Cancel</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

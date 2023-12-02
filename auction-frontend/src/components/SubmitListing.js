@@ -96,6 +96,12 @@ import config from "../config";
                 </div>
                 <div className="row mt-2">
                     <div className="col-4">
+                        <label htmlFor="byNowPrice" className="form-label">Enter a buy-now price amount:<strong style={{ color: 'red' }}>*</strong></label>
+                        <input type="number" className="form-control" id="byNowPrice" name="byNowPrice" value={formData.byNowPrice} onChange={handleChange} />
+                    </div>
+                </div>
+                <div className="row mt-2">
+                    <div className="col-4">
                         <label htmlFor="quantity" className="form-label">Enter the quantity:<strong style={{ color: 'red' }}>*</strong></label>
                         <input type="number" className="form-control" id="quantity" name="quantity" value={formData.quantity} onChange={handleChange} />
                     </div>

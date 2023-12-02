@@ -145,7 +145,7 @@ def login():
 
     if user and check_password_hash(user['password'], password):
 
-        return jsonify({'success': True, 'user': {'username': user['userName'], 'email': user['email'], 'id': user['userID']}})
+        return jsonify({'success': True, 'user': {'username': user['userName'], 'email': user['email'], 'id': user['userID'], 'isAdmin': user['isAdmin']}})
 
     return jsonify({'success': False, 'error': 'Invalid username or password'}), 401
 
@@ -214,6 +214,43 @@ def get_active_listings(user_id):
             Listings.userID = %s AND Listings.status = 'active';
         """
         query_params = (user_id,)
+
+    listings = db.execute_query(db_connection=db_conn, query=listings_query, query_params=query_params).fetchall()
+
+    processed_listings = []
+    for listing in listings:
+        processed_listing = {}
+        for key, value in listing.items():
+            if isinstance(value, Decimal):
+                processed_listing[key] = str(value)
+            elif isinstance(value, datetime):
+                processed_listing[key] = value.strftime('%Y-%m-%d %H:%M')
+            else:
+                processed_listing[key] = value
+        processed_listings.append(processed_listing)
+
+    return jsonify({'success': True, 'data': processed_listings})
+
+@app.route('/user/<int:user_id>/shopping-cart', methods=['GET'])
+def get_shopping_cart(user_id):
+    # print(f"get_active_listings called with user_id: {user_id}")
+    db_conn = db.connect_to_database()
+
+    listings_query = """
+    SELECT 
+        Listings.*, 
+        Photos.photoPath,
+        Bids.bidAmt
+    FROM 
+        Listings 
+    LEFT JOIN 
+        Photos ON Listings.listingID = Photos.listingID
+    LEFT JOIN 
+        Bids ON Listings.bidID = Bids.bidID
+    WHERE 
+        Listings.userID = %s AND Listings.status = 'hold';
+    """
+    query_params = (user_id,)
 
     listings = db.execute_query(db_connection=db_conn, query=listings_query, query_params=query_params).fetchall()
 
