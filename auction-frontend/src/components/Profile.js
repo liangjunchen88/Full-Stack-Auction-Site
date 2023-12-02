@@ -111,7 +111,7 @@ function Profile({ user }) {
                                 <td>{listing.name}</td>
                                 <td>{listing.bidAmt}</td>
                                 <td>{listing.startPrice}</td>
-                                <td>{new Date(listing.expirationDate).toLocaleDateString()}</td>
+                                <td>{new Date(listing.endDate).toLocaleDateString()}</td>
                                 <td>
                                     {/* 操作按钮 */}
                                     <button className="btn btn-danger">Cancel</button>
