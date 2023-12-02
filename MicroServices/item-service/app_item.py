@@ -47,7 +47,9 @@ def get_listings():
     LEFT JOIN 
         Bids ON Listings.bidID = Bids.bidID
     WHERE 
-        Listings.userID IS NOT NULL AND Listings.status = 'active';
+        Listings.userID IS NOT NULL AND Listings.status = 'active'
+    ORDER BY Listings.endDate ASC;
+        
     """
 
     listings = db.execute_query(db_connection=db_conn, query=query).fetchall()
@@ -248,6 +250,41 @@ def end_listing():
               " has been created.")
         return jsonify({'success': True, 'message': "shopping cart created"}), 200
 
+@app.route('/get-shoppingcart', methods=['GET'])
+def get_shoppingcart():
+    userID = request.json['userID']
+    db_conn = db.connect_to_database()
+    query = """
+    SELECT 
+        sc.shoppingcartRecordID,
+        sc.listingID, 
+        l.name, 
+        l.endDate,
+        sc.dealPrice, 
+        l.shippingCosts, 
+        l.quantity, 
+        l.description
+    FROM 
+        shoppingcartRecords sc
+    JOIN 
+        Listings l ON sc.listingID = l.listingID
+    WHERE 
+        sc.userID = %s;
+    """
+    listings = db.execute_query(db_connection=db_conn, query=query, query_params=(userID)).fetchall()
+    processed_listings = []
+    for listing in listings:
+        processed_listing = {}
+        for key, value in listing.items():
+            if isinstance(value, Decimal):
+                processed_listing[key] = str(value)
+            elif isinstance(value, datetime):
+                processed_listing[key] = value.strftime('%Y-%m-%d %H:%M')
+            else:
+                processed_listing[key] = value
+        processed_listings.append(processed_listing)
+    return jsonify({'success': True, 'data': processed_listings}), 200
+
 
 @app.route('/terminate-listing', methods=['POST'])
 def terminate_listing():
@@ -337,6 +374,28 @@ def add_watchlist():
             db_connection=db_conn, query=query, query_params=(userID,lowerPrice,upperPrice,keyword))
 
         return jsonify({'success': True, 'message': "a watchlist has been created"}), 200
+
+@app.route('/get-watchlist', methods=['GET'])
+def get_watchlist():
+    userID = request.json['userID']
+    db_conn = db.connect_to_database()
+    query = """
+    SELECT * FROM watchlists where userID = %s;
+    """
+    listings = db.execute_query(db_connection=db_conn, query=query, query_params=(userID)).fetchall()
+    processed_listings = []
+    for listing in listings:
+        processed_listing = {}
+        for key, value in listing.items():
+            if isinstance(value, Decimal):
+                processed_listing[key] = str(value)
+            elif isinstance(value, datetime):
+                processed_listing[key] = value.strftime('%Y-%m-%d %H:%M')
+            else:
+                processed_listing[key] = value
+        processed_listings.append(processed_listing)
+    return jsonify({'success': True, 'data': processed_listings}), 200
+
 
 
 
