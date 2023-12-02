@@ -7,7 +7,15 @@ function Listings() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
   const [hasResults, setHasResults] = useState(true);
+  const [bidAmount, setBidAmount] = useState('');
 
+  const handleBidSubmit = () => {
+      console.log('Bid submitted:', bidAmount);
+  };
+
+  const handleBuyNow = () => {
+      console.log('Buy Now clicked for item:');
+  };
   useEffect(() => {
     // Fetch all listings
     axios.get(`${config.itemServiceUrl}/listings`)
@@ -88,9 +96,40 @@ function Listings() {
                   <p className="card-subtitle mb-2 text-muted">Ends: {formatDate(item.endDate)}</p>
                 </div>
                 <div className="card-footer bg-transparent">
-                  <span>Current Bid: ${item.bidAmt}    |   Buy Now Price: ${item.buyNowPrice}</span>
-                  <span></span>
+            <div>
+                <span>Current Bid: ${item.bidAmt} | Buy Now Price: ${item.buyNowPrice}</span>
+                <div className="mt-3">
+                    <div className="input-group mb-3">
+                        <input 
+                            type="text" 
+                            className="form-control" 
+                            placeholder="Enter bid amount" 
+                            aria-label="Bid Amount" 
+                            value={bidAmount} 
+                            onChange={(e) => setBidAmount(e.target.value)} 
+                        />
+                        <div className="input-group-append ">
+                            <button 
+                                className="btn btn-primary" 
+                                type="button"
+                                onClick={handleBidSubmit}
+                            >
+                                Place Bid
+                            </button>
+                        </div>
+                    </div>
                 </div>
+                <div>
+                    <button 
+                        className="btn btn-primary" 
+                        type="button"
+                        onClick={handleBuyNow}
+                    >
+                        Buy It Now
+                    </button>
+                </div>
+            </div>
+        </div>
                 {/* 表单和按钮可以根据具体需求添加 */}
               </div>
             </div>
