@@ -47,7 +47,9 @@ def get_listings():
     LEFT JOIN 
         Bids ON Listings.bidID = Bids.bidID
     WHERE 
-        Listings.userID IS NOT NULL AND Listings.status = 'active';
+        Listings.userID IS NOT NULL AND Listings.status = 'active'
+    ORDER BY Listings.endDate ASC;
+        
     """
 
     listings = db.execute_query(db_connection=db_conn, query=query).fetchall()
