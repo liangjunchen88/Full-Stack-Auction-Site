@@ -8,10 +8,12 @@ import Register from './components/Register';
 import Login from "./components/Login";
 import Navbar from './components/Navbar';
 import Profile from "./components/Profile";
+import SubmitListingForm from './components/SubmitListing';
+import useLocalStorage from './hooks/useLocalStorage';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState({});
+  const [user, setUser] = useLocalStorage("user",null);
 
   const handleLogin = (userData) => {
     setIsLoggedIn(true);
@@ -31,6 +33,7 @@ function App() {
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile user={user} />} />
+        <Route path="/submit-listing" element={<SubmitListingForm/>} />
         {/* other routes */}
       </Routes>
     </Router>
