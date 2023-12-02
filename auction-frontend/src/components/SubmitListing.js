@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import useLocalStorage from '../hooks/useLocalStorage';
+import axios from 'axios';
+import config from "../config";
 
  const SubmitListingForm =()=> {
     const [formData, setFormData] = useState({
@@ -8,6 +11,7 @@ import React, { useState } from 'react';
         quantity: '',
         shippingCosts: '',
         expiration: '',
+        startDate: '',
         photo: null
     });
 
@@ -19,10 +23,46 @@ import React, { useState } from 'react';
         }));
     };
 
-    const handleSubmit = (e) => {
+   const [user,_] = useLocalStorage('user',{});
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // 在这里处理表单数据提交的逻辑
-        console.log(formData);
+        setFormData({
+            ...formData,
+            userID: user.username
+        })
+        const form = new FormData();
+        form.append('name', formData.name);
+        form.append('description', formData.description);
+        form.append('startPrice', formData.startPrice);
+        form.append('quantity', formData.quantity);
+        form.append('shippingCosts', formData.shippingCosts);
+        form.append('endDate', formData.expiration);
+        form.append('startDate', formData.startDate);
+        form.append('file', formData.photo);
+        form.append('userID', user.id);
+        const response = await axios(
+            {
+                method: 'post',
+                url: `${config.itemServiceUrl}/submit-listing`,
+                data: form,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            }
+        )
+        if (response.status === 200) {
+            alert('Listing submitted successfully');
+            setFormData({
+                name: '',
+                description: '',
+                startPrice: '',
+                quantity: '',
+                shippingCosts: '',
+                expiration: '',
+                startDate: '',
+                photo: null
+            })
+        }
     };
 
     return (
@@ -64,6 +104,12 @@ import React, { useState } from 'react';
                     <div className="col-4">
                         <label htmlFor="shippingCosts" className="form-label">Enter the shipping costs:<strong style={{ color: 'red' }}>*</strong></label>
                         <input type="number" className="form-control" id="shippingCosts" name="shippingCosts" value={formData.shippingCosts} onChange={handleChange} />
+                    </div>
+                </div>
+                <div className="row mt-2">
+                    <div className="col-4">
+                        <label htmlFor="startDate" className="form-label">Set an start date date for your auction:<strong style={{ color: 'red' }}>*</strong></label>
+                        <input type="date" className="form-control" id="startDate" name="startDate" value={formData.startDate} onChange={handleChange} />
                     </div>
                 </div>
                 <div className="row mt-2">

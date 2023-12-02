@@ -110,50 +110,6 @@ def place_bid(list_id):
             flash(message, 'success')
             return redirect(url_for('root'))
 
-@app.route('/submit-listing', methods=['POST'])
-def submit_listing():
-    if request.method == 'POST':
-        data = request.get_json() 
-        name = data.get('name')
-        user_id = data.get('userID') 
-        start_date = data['startDate']
-        end_date = data['endDate']
-        start_price = data['startPrice']
-        buy_now_price = data.get('buyNowPrice', None)  
-        description = data.get('description', None) 
-        quantity = data['quantity']
-        shipping_costs = data['shippingCosts']
-        num_flagged = data['numFlagged']
-        status = data['status']
-
-        db_conn = db.connect_to_database()
-        query = """
-            INSERT INTO Listings (
-                name, userID, startDate, endDate, startPrice, 
-                buyNowPrice, description, quantity, shippingCosts, 
-                numFlagged, status
-            ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
-            )
-        """
-        db.execute_query(
-            db_connection=db_conn, query=query,
-            query_params=(
-                name, user_id, start_date, end_date, start_price, 
-                buy_now_price, description, quantity, shipping_costs, 
-                num_flagged, status
-            )
-        )
-
-        # Optionally, flash a success message and redirect
-        # flash("Listing submitted successfully.", 'success')
-        # return redirect(url_for('root'))
-
-        return jsonify({"message": "Listing submitted successfully."}), 201
-
-    # If not a POST request, you can handle it differently or raise an error
-    return jsonify({"error": "Invalid request method."}), 405
-
 
 # Listener
 if __name__ == "__main__":

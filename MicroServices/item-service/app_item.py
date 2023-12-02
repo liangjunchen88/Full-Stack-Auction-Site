@@ -1,3 +1,4 @@
+import uuid
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from decimal import Decimal, InvalidOperation, ROUND_DOWN
@@ -148,29 +149,33 @@ def submit_listing():
     db_conn = db.connect_to_database()
 
     if request.method == 'POST':
-        data = request.json
-        name = data['name']
-        userID = data['userID']
-        startDate = data['startDate']
-        endDate = data['endDate']
-        startPrice = process_price(data['startPrice'])
-        buyNowPrice = process_price(data['buyNowPrice'])
-        description = data['description']
-        quantity = data['quantity']
-        shippingCosts = process_price(data['shippingCosts'])
+        # Use request.form for text fields
+
+        name = request.form['name']
+        userID = request.form['userID']
+        startDate = request.form['startDate']
+        endDate = request.form['endDate']
+        startPrice = process_price(request.form['startPrice'])
+        buyNowPrice = 0
+        description = request.form['description']
+        quantity = request.form['quantity']
+        shippingCosts = process_price(request.form['shippingCosts'])
         numFlagged = 0
         status = "active"
 
-        # user photo stored at static/img/ otherwise default photo used
-        # photo = request.files['photo']
+        # Handling file upload
+        photo = request.files['file']
         filepath = "./static/img/No_image_available.jpg"
-        # if photo.filename != '':
-        #     filename = secure_filename(photo.filename)
-        #     filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        #     photo.save(filepath)
+        # generate the unique filename
+        
+        if photo and photo.filename != '':
 
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'],str(uuid.uuid4())+'.jpg')
+            photo.save(filepath)
+
+        # Rest of the code remains the same
         query = "INSERT INTO Listings (name, userID, startDate, endDate, startPrice, buyNowPrice, " \
-                "description, quantity, shippingCosts,numFlagged, status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+                "description, quantity, shippingCosts, numFlagged, status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
         cursor = db.execute_query(
             db_connection=db_conn, query=query, query_params=(name, userID, startDate, endDate, startPrice, buyNowPrice,
                                                               description, quantity, shippingCosts, numFlagged, status))
