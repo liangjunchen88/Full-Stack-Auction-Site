@@ -4,6 +4,8 @@ import os
 import database.db_connector as db
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
+from decimal import Decimal, InvalidOperation, ROUND_DOWN
+from datetime import datetime
 
 # Set up upload folder
 UPLOAD_FOLDER = 'static/img/'
@@ -36,7 +38,19 @@ def get_listings():
     """
 
     listings = db.execute_query(db_connection=db_conn, query=query).fetchall()
-    return jsonify({'success': True, 'data': listings})
+
+    processed_listings = []
+    for listing in listings:
+        processed_listing = {}
+        for key, value in listing.items():
+            if isinstance(value, Decimal):
+                processed_listing[key] = str(value)
+            elif isinstance(value, datetime):
+                processed_listing[key] = value.strftime('%Y-%m-%d %H:%M')
+            else:
+                processed_listing[key] = value
+        processed_listings.append(processed_listing)
+    return jsonify({'success': True, 'data': processed_listings})
 
 
 # Route for searching listings
@@ -115,10 +129,20 @@ def get_user_profile(user_id):
     user_query = "SELECT * FROM Users WHERE userID = %s;"
     user = db.execute_query(db_connection=db_conn, query=user_query, query_params=(user_id,)).fetchone()
 
+
+    processed_listing = {}
+    for key, value in user.items():
+        if isinstance(value, Decimal):
+            processed_listing[key] = str(value)
+        elif isinstance(value, datetime):
+            processed_listing[key] = value.strftime('%Y-%m-%d %H:%M')
+        else:
+            processed_listing[key] = value
+
     if not user:
         return jsonify({'success': False, 'error': 'User not found'}), 404
 
-    return jsonify({'success': True, 'data': user})
+    return jsonify({'success': True, 'data': processed_listing})
 
 
 @app.route('/user/<int:user_id>/active-listings', methods=['GET'])
@@ -136,11 +160,23 @@ def get_active_listings(user_id):
     LEFT JOIN 
         Bids ON Listings.bidID = Bids.bidID
     WHERE 
-        Listings.userID = %s AND Listings.endDate >= NOW();
+        Listings.userID = %s AND Listings.status = 'active';
     """
     listings = db.execute_query(db_connection=db_conn, query=listings_query, query_params=(user_id,)).fetchall()
 
-    return jsonify({'success': True, 'data': listings})
+    processed_listings = []
+    for listing in listings:
+        processed_listing = {}
+        for key, value in listing.items():
+            if isinstance(value, Decimal):
+                processed_listing[key] = str(value)
+            elif isinstance(value, datetime):
+                processed_listing[key] = value.strftime('%Y-%m-%d %H:%M')
+            else:
+                processed_listing[key] = value
+        processed_listings.append(processed_listing)
+
+    return jsonify({'success': True, 'data': processed_listings})
 
 
 @app.route('/user/<int:user_id>/bid-history', methods=['GET'])
@@ -159,7 +195,19 @@ def get_bid_history(user_id):
     """
     bid_history = db.execute_query(db_connection=db_conn, query=bid_history_query, query_params=(user_id,)).fetchall()
 
-    return jsonify({'success': True, 'data': bid_history})
+    processed_listings = []
+    for listing in bid_history:
+        processed_listing = {}
+        for key, value in listing.items():
+            if isinstance(value, Decimal):
+                processed_listing[key] = str(value)
+            elif isinstance(value, datetime):
+                processed_listing[key] = value.strftime('%Y-%m-%d %H:%M')
+            else:
+                processed_listing[key] = value
+        processed_listings.append(processed_listing)
+
+    return jsonify({'success': True, 'data': processed_listings})
 
 
 
