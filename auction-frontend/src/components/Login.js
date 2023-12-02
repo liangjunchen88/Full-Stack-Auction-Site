@@ -34,10 +34,10 @@ function Login({ onLogin }) {
                     if (response_log.status === 200) {
                         console.log('Login information saved successfully:', response_log.data);
                     } else {
-                        console.error('Login information failed to be saved:', response);
+                        console.error('Login information failed to be saved:', response_log);
                     }
                 } catch (error) {
-                    console.error('There was an error during the login process:', error);
+                    console.error('There was an error while saving the login information:', error);
                 }
 
                 navigate('/');
