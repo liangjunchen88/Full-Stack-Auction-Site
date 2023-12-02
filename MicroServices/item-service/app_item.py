@@ -72,7 +72,7 @@ def get_listings():
 
 
 # Route for searching listings
-@app.route('/search', methods=['GET'])
+@app.route('/search', methods=['POST'])
 def search_listings():
     search_query = request.json['searchquery']
     db_conn = db.connect_to_database()
@@ -103,7 +103,7 @@ def search_listings():
         processed_listings.append(processed_listing)
     return jsonify({'success': True, 'data': processed_listings})
 
-@app.route('/search-by-category', methods=['GET'])
+@app.route('/search-by-category', methods=['POST'])
 def search_by_category():
     category = request.json['category']
 
@@ -255,7 +255,7 @@ def end_listing():
               " has been created.")
         return jsonify({'success': True, 'message': "shopping cart created"}), 200
 
-@app.route('/get-shoppingcart', methods=['GET'])
+@app.route('/get-shoppingcart', methods=['POST'])
 def get_shoppingcart():
     userID = request.json['userID']
     db_conn = db.connect_to_database()
@@ -380,7 +380,7 @@ def add_watchlist():
 
         return jsonify({'success': True, 'message': "a watchlist has been created"}), 200
 
-@app.route('/get-watchlist', methods=['GET'])
+@app.route('/get-watchlist', methods=['POST'])
 def get_watchlist():
     userID = request.json['userID']
     db_conn = db.connect_to_database()
