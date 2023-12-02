@@ -93,8 +93,11 @@ Installing Instruction:
 	3. Run the Application
 	split into 5 terminals
 	```
+	python .\MicroServices\alert-service\app_alert.py
 	python .\MicroServices\auction-service\app_auction.py
-	python .\MicroServices\item-service\app_item.py
+	cd .\MicroServices\item-service\
+	python app_item.py
+	python .\MicroServices\log-service\app_log.py
 	python .\MicroServices\rating-service\app_rating.py
 	python .\MicroServices\user-service\app_user.py
 

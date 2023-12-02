@@ -8,6 +8,7 @@ from validation import validate_new_listing, validate_photo, validate_bid
 import threading
 # from datetime import datetime
 import datetime
+import time
 
 # Set up upload folder
 UPLOAD_FOLDER = 'static/img/'
@@ -52,8 +53,8 @@ def update_listing_status():
         time.sleep(1)
 
 # Start the thread
-update_thread = threading.Thread(target=update_listing_status)
-update_thread.start()
+# update_thread = threading.Thread(target=update_listing_status)
+# update_thread.start()
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -81,11 +82,11 @@ def root():
     return render_template('main.j2', listings=listings, bids=bids, photos=photos)
 
 
-@app.route('/place-bid/<int:list_id>', methods=['GET', 'POST'])
+@app.route('/place-bid/<int:list_id>', methods=['POST'])
 def place_bid(list_id):
-    if request.method == 'POST':
-        bid_amt = int(request.form['bid'])
-        bid_date = date.today()
+        data = request.get_json()
+        bid_amt = int(data['bid'])
+        bid_date = datetime.date.today()
         db_conn = db.connect_to_database()
 
         query = "SELECT l.listingID, l.bidID, l.startPrice as startPrice, b.bidAmt as amount FROM Listings l LEFT JOIN Bids b ON l.bidID = b.bidID WHERE l.listingID = %s;"

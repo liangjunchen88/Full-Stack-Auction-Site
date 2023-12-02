@@ -8,6 +8,7 @@ from validation import validate_new_listing, validate_photo, validate_bid
 import threading
 # from datetime import datetime
 import datetime
+import time
 
 # Set up upload folder
 UPLOAD_FOLDER = 'static/img/'

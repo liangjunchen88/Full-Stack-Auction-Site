@@ -15,8 +15,8 @@ CREATE TABLE Users (
 );
 
 INSERT INTO Users (userName, password, firstName, lastName, email, dateJoined, rating, isActive, isAdmin) VALUES
-                                                                                   ('johndoe', 'pbkdf2:sha256:150000$iD5kR8qS$01a43a001a115b0747ed312a66686405225c1658ab8bf57f5a46e94d0393039e',
-                                                                                    'John', 'Doe', 'johndoe@gmail.com', '2024-04-04', 5.0, TRUE, FALSE);
+                                                                                   ('admin', 'pbkdf2:sha256:600000$CTYVAFWbbePXQ7l8$14fa1e578e31b963ee1e19079261eeeb9192ae22cc7f53d3e80f7da24d877a2e',
+                                                                                    'admin', '', 'admin@gmail.com', '2023-11-30', 5.0, TRUE, TRUE);
 
 DROP TABLE IF EXISTS Listings;
 
