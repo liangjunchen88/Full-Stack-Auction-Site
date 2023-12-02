@@ -50,8 +50,7 @@ function Listings() {
   };
   useEffect(() => {
     // Fetch all listings
-    axios
-      .get(`${config.itemServiceUrl}/listings`)
+    axios.get(`${config.itemServiceUrl}/listings`)
       .then((response) => {
         setListings(response.data.data);
         setFilteredResults(response.data.data); // Default to showing all listings
@@ -75,8 +74,7 @@ function Listings() {
       setFilteredResults(listings);
       setHasResults(listings.length > 0);
     } else {
-      axios
-        .post(`${config.itemServiceUrl}/search`, { searchquery: searchQuery })
+      axios.post(`${config.itemServiceUrl}/search`, { searchquery: searchQuery })
         .then((response) => {
           setFilteredResults(response.data.data);
           setHasResults(response.data.data.length > 0);
