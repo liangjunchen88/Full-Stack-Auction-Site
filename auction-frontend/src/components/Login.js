@@ -27,6 +27,19 @@ function Login({ onLogin }) {
                 console.log('Login successful:', response.data);
                 onLogin(response.data);
 
+                try {
+                    const response_log = await axios.post(`${config.logServiceUrl}/log`, {
+                        username: formData.username
+                    });
+                    if (response_log.status === 200) {
+                        console.log('Login information saved successfully:', response_log.data);
+                    } else {
+                        console.error('Login information failed to be saved:', response);
+                    }
+                } catch (error) {
+                    console.error('There was an error during the login process:', error);
+                }
+
                 navigate('/');
             } else {
                 console.error('Login failed:', response);
