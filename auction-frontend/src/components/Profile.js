@@ -27,7 +27,12 @@ function Profile({ user }) {
   const [upperPrice, setUpperPrice] = useState('');
   const [keyword, setKeyword] = useState('');
 
-  const handleSubmit = () => {
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [dateList, setDateList] = useState([]);
+
+
+  const handleWatchlistSubmit = () => {
     const data = {
       'userID':user.id,
       'keyword':keyword,
@@ -42,6 +47,19 @@ function Profile({ user }) {
         .catch(error => {
           alert('Error creating watchlist: ' + error.message);
         });
+  };
+
+  const handleFilterSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:9991/search-by-time', {
+        filterStartDate: startDate,
+        filterEndDate: endDate
+      });
+      setDateList(response.data.data);
+    } catch (error) {
+      alert('Error fetching the list: ' + error.message);
+    }
   };
 
 
@@ -229,6 +247,60 @@ function Profile({ user }) {
         </table>
       </div>
 
+      {user.isAdmin && (
+          <div className="mt-5">
+            <form onSubmit={handleFilterSubmit}>
+              <label>
+                End date from:
+                <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                />
+              </label>
+              <label>
+                to:
+                <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                />
+              </label>
+              <button type="submit">Search</button>
+            </form>
+
+            <h4 style={{ color: "maroon" }}>Closed Listings</h4>
+            <table className="table table-striped table-hover">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Bid Amount</th>
+                <th>Start Price</th>
+                <th>End Date</th>
+                <th>ShippingCosts</th>
+                <th>NUmber of Flags</th>
+                <th>Status</th>
+              </tr>
+              </thead>
+              <tbody>
+              {dateList.map((listing, index) => (
+                  <tr key={listing.listingID}>
+                    <th>{index + 1}</th>
+                    <td>{listing.name}</td>
+                    <td>{listing.bidAmt}</td>
+                    <td>{listing.startPrice}</td>
+                    <td>{listing.endDate}</td>
+                    <td>{listing.shippingCosts}</td>
+                    <td>{listing.numFlagged}</td>
+                    <td>{listing.status}</td>
+                  </tr>
+              ))}
+              </tbody>
+            </table>
+          </div>
+      )}
+
       {/* Bid history Table - Only render for normal users */}
       {!user.isAdmin && (
         <div className="mt-5">
@@ -364,7 +436,7 @@ function Profile({ user }) {
                   value={keyword}
                   onChange={e => setKeyword(e.target.value)}
               />
-              <button onClick={handleSubmit}>Create Watchlist</button>
+              <button onClick={handleWatchlistSubmit}>Create Watchlist</button>
             </div>
 
           </div>
