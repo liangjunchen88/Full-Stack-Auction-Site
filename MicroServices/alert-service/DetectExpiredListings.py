@@ -18,7 +18,7 @@ db_conn = db.connect_to_database()
 def check_expired_listings():
     now = datetime.now()
 
-    query = "SELECT * FROM listings WHERE expirationDate <= %s"
+    query = "SELECT * FROM listings WHERE endDate <= %s"
     expired_listings = db.execute_query(
         db_connection=db_conn,
         query=query,

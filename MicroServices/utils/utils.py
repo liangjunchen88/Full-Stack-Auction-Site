@@ -21,11 +21,10 @@ def send_notification(receiver, msg):
     if response.status_code == 200:
         print("notification sent successful!")
         print("Response content:", response.content.decode())
-        write_log(f"Send notice to {receiver} success! Message: {msg}")
+        #write_log(f"Send notice to {receiver} success! Message: {msg}")
     else:
         print("notification failed with status code:", response.status_code)
-        write_log(
-            f"Send notice to {receiver} failed. Code: {response.status_code}")
+        #write_log(f"Send notice to {receiver} failed. Code: {response.status_code}")
 
 
 def send_alert(receiver, msg):
@@ -34,11 +33,10 @@ def send_alert(receiver, msg):
     if response.status_code == 200:
         print("Alert sent successful!")
         print("Response content:", response.content.decode())
-        write_log(f"Send alert to {receiver} success! Message: {msg}")
+        #write_log(f"Send alert to {receiver} success! Message: {msg}")
     else:
         print("Alert failed with status code:", response.status_code)
-        write_log(
-            f"Send alert to {receiver} failed. Code: {response.status_code}")
+        #write_log(f"Send alert to {receiver} failed. Code: {response.status_code}")
 
 
 if __name__ == "__main__":

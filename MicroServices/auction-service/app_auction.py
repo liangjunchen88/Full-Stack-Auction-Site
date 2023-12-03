@@ -72,31 +72,6 @@ def process_price(raw_price):
     except (InvalidOperation, ValueError):
         raise ValueError("Invalid start price")
 
-@app.route('/', methods=['GET', 'POST'])
-def root():
-    db_conn = db.connect_to_database()
-
-    query = "SELECT bidID, bidAmt FROM Bids;"
-    bids = db.execute_query(db_connection=db_conn, query=query).fetchall()
-
-    query = "SELECT listingID, photoPath FROM Photos;"
-    photos = db.execute_query(
-        db_connection=db_conn, query=query).fetchall()
-
-    if request.method == 'GET':
-        query = "SELECT * FROM Listings WHERE userID IS NOT NULL AND expirationDate >= NOW();"
-        listings = db.execute_query(
-            db_connection=db_conn, query=query).fetchall()
-
-    elif request.method == 'POST':
-        search_query = f"%{request.form['searchquery']}%"
-        query = "SELECT * FROM Listings WHERE name LIKE %s AND userID IS NOT NULL AND expirationDate >= NOW();"
-        listings = db.execute_query(db_connection=db_conn, query=query,
-                                    query_params=(search_query,)).fetchall()
-
-    return render_template('main.j2', listings=listings, bids=bids, photos=photos)
-
-
 @app.route('/place-bid/<int:list_id>', methods=['POST'])
 def place_bid(list_id):
         data = request.get_json()
@@ -133,7 +108,7 @@ def place_bid(list_id):
 
         if not valid_bid:
             flash(message, 'danger')
-            return redirect(url_for('root'))
+            return jsonify({'success': False, "message": "invalid bid"}), 400
         else:
             query = "INSERT INTO Bids (userID, listingID, bidAmt, bidDate) VALUES (%s, %s, %s, %s)"
             cursor = db.execute_query(db_connection=db_conn, query=query,
@@ -152,7 +127,7 @@ def place_bid(list_id):
                 send_alert(buyerEmail['email'], "Someone has placed a higher bid than you!")
 
             flash(message, 'success')
-            return redirect(url_for('root'))
+            return jsonify({'success': True, "message": "your bid has been placed"}), 200
 
 
 # Listener
