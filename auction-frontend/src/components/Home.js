@@ -17,26 +17,30 @@ function Listings() {
   const handleBidSubmit = (listingID) => {
     const bidAmount = bidAmounts[listingID];
     const url = `${config.backendUrl}/place-bid/${listingID}`;
-    
-    axios.post(url, {
-      bid: bidAmount,
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    .then((response) => {
-      console.log("Bid placed successfully", response);
-      setBidAmounts((prevBidAmounts) => ({
-        ...prevBidAmounts,
-        [listingID]: "",
-      }));
-    })
-    .catch((error) => {
-      console.error("Error placing bid", error);
-    });
+
+    axios
+      .post(
+        url,
+        {
+          bid: bidAmount,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
+        console.log("Bid placed successfully", response);
+        setBidAmounts((prevBidAmounts) => ({
+          ...prevBidAmounts,
+          [listingID]: "",
+        }));
+      })
+      .catch((error) => {
+        console.error("Error placing bid", error);
+      });
   };
-  
 
   const handleBidAmountChange = (listingID, amount) => {
     setBidAmounts((prevBidAmounts) => ({
@@ -50,7 +54,8 @@ function Listings() {
   };
   useEffect(() => {
     // Fetch all listings
-    axios.get(`${config.itemServiceUrl}/listings`)
+    axios
+      .get(`${config.itemServiceUrl}/listings`)
       .then((response) => {
         setListings(response.data.data);
         setFilteredResults(response.data.data); // Default to showing all listings
@@ -74,7 +79,8 @@ function Listings() {
       setFilteredResults(listings);
       setHasResults(listings.length > 0);
     } else {
-      axios.post(`${config.itemServiceUrl}/search`, { searchquery: searchQuery })
+      axios
+        .post(`${config.itemServiceUrl}/search`, { searchquery: searchQuery })
         .then((response) => {
           setFilteredResults(response.data.data);
           setHasResults(response.data.data.length > 0);
@@ -115,7 +121,7 @@ function Listings() {
               <div className="col" key={item.listingID}>
                 <div className="card h-100">
                   <img
-                    src={process.env.PUBLIC_URL + item.photoPath}
+                    src={config.itemServiceUrl + "/" + item.photoPath}
                     className="card-img-top"
                     alt={item.name}
                   />

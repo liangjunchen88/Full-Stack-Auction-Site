@@ -250,13 +250,17 @@ def submit_listing():
         numFlagged = 0
         status = "active"
 
-        # Handling file upload
-        photo = request.files['file']
+        if 'file' in request.files:
+            photo = request.files['file']
+        else:
+            photo = None
+
         filepath = "./static/img/No_image_available.jpg"
         # generate the unique filename
 
         if photo and photo.filename != '':
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], str(uuid.uuid4()) + '.jpg')
+
+            filepath = os.path.join("./"+app.config['UPLOAD_FOLDER'],str(uuid.uuid4())+'.jpg')
             photo.save(filepath)
 
         # Rest of the code remains the same
