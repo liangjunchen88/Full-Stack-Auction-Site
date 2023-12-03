@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './static/css/style.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
@@ -12,18 +12,16 @@ import SubmitListingForm from './components/SubmitListing';
 import useLocalStorage from './hooks/useLocalStorage';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useLocalStorage("user",null);
-
+  const isLoggedIn = useMemo(() => !!user, [user]);
   const handleLogin = (userData) => {
-    setIsLoggedIn(true);
     setUser(userData.user);
   };
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUser({});
+    setUser(null);
   };
+
 
   return (
     <Router>
