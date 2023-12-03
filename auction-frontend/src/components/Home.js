@@ -82,7 +82,7 @@ function Listings() {
           {filteredResults.map(item => (
             <div className="col" key={item.listingID}>
               <div className="card h-100">
-                <img src={process.env.PUBLIC_URL + item.photoPath}
+                <img src={config.itemServiceUrl+"/" + item.photoPath}
                      className="card-img-top" alt={item.name} />
                 {/*<img src={item.photoPath ? process.env.PUBLIC_URL + item.photoPath :*/}
                 {/*    process.env.PUBLIC_URL + '/static/img/No_image_available.jpg'}*/}

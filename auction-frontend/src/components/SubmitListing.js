@@ -126,7 +126,7 @@ import config from "../config";
                 </div>
                 <div className="row my-5">
                     <div className="col-4">
-                        <button className="btn main-button" type="submit">Submit Listing</button>
+                        <button className="btn main-button btn-primary" type="submit">Submit Listing</button>
                     </div>
                 </div>
             </form>
