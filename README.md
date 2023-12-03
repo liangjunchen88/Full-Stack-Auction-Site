@@ -98,7 +98,7 @@ Installing Instruction:
 	cd .\MicroServices\item-service\
 	python app_item.py
 	python .\MicroServices\log-service\app_log.py
-	python .\MicroServices\rating-service\app_rating.py
+	python .\MicroServices\notification-service\app_notification.py
 	python .\MicroServices\user-service\app_user.py
 
 	cd .\auction-frontend\

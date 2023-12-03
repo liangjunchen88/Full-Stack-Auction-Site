@@ -219,39 +219,37 @@ function Profile({ user }) {
         </div>
       )}
 
-      {/* User Management Table - Only render if user is an admin */}
-      {user.isAdmin && (
-        <div className="mt-5">
-          <h4 style={{ color: "maroon" }}>User Management</h4>
-          <table className="table table-striped table-hover">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>User</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Date Joined</th>
-                <th>Actions</th>
+      {/* User Management Table - for all users */}
+      <div className="mt-5">
+        <h4 style={{ color: "maroon" }}>User Management</h4>
+        <table className="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>User</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Date Joined</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {activeUsers.map((user, index) => (
+              <tr key={user.userID}>
+                <th scope="row">{index + 1}</th>
+                <td>{user.userName}</td>
+                <td>{user.firstName}</td>
+                <td>{user.lastName}</td>
+                <td>{new Date(user.dateJoined).toLocaleDateString()}</td>
+                <td>
+                  {/* operation button */}
+                  <button className="btn btn-danger">Delete</button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {activeUsers.map((user, index) => (
-                <tr key={user.userID}>
-                  <th scope="row">{index + 1}</th>
-                  <td>{user.userName}</td>
-                  <td>{user.firstName}</td>
-                  <td>{user.lastName}</td>
-                  <td>{new Date(user.dateJoined).toLocaleDateString()}</td>
-                  <td>
-                    {/* operation button */}
-                    <button className="btn btn-danger">Delete</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Shopping Cart Table - Only render for normal users */}
       {!user.isAdmin && (

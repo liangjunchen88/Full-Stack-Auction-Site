@@ -19,44 +19,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config.from_mapping(SECRET_KEY='dev')
 CORS(app)  # Enable CORS
 
-# The function for keep looping and check the status of the listings
-def update_listing_status():
-    while True:
-        current_time = datetime.datetime.now()
-        db_conn = db.connect_to_database()
-
-        # Update listings to 'active' if current time is equal to startDate
-        update_query = """
-        UPDATE Listings 
-        SET status = 'active' 
-        WHERE startDate <= %s AND endDate > %s AND status != 'active';
-        """
-        db.execute_query(db_connection=db_conn, query=update_query, query_params=(current_time, current_time))
-
-        # Update listings to 'hold' if current time is greater than or equal to endDate
-        update_query = """
-        UPDATE Listings 
-        SET status = 'hold' 
-        WHERE endDate <= %s AND status != 'hold';
-        """
-        db.execute_query(db_connection=db_conn, query=update_query, query_params=(current_time,))
-        
-        # Update countdown for active listings
-        update_query = """
-        UPDATE Listings 
-        SET countDown = TIMESTAMPDIFF(SECOND, %s, endDate) 
-        WHERE endDate > %s AND status = 'active';
-        """
-        db.execute_query(db_connection=db_conn, query=update_query, query_params=(current_time, current_time))
-
-        # Sleep for 1 second before the next check, maybe we can change to 60s
-        time.sleep(1)
-
-# Start the thread
-update_thread = threading.Thread(target=update_listing_status)
-update_thread.start()
-
-
 @app.route('/', methods=['GET', 'POST'])
 def root():
     db_conn = db.connect_to_database()

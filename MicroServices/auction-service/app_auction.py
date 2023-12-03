@@ -1,3 +1,4 @@
+from decimal import ROUND_DOWN, Decimal, InvalidOperation
 from flask import Flask, render_template, request, redirect, g, url_for, flash,jsonify
 import os
 import database.db_connector as db
@@ -56,9 +57,20 @@ def update_listing_status():
         time.sleep(1)
 
 # Start the thread
-# update_thread = threading.Thread(target=update_listing_status)
-# update_thread.start()
+update_thread = threading.Thread(target=update_listing_status)
+update_thread.start()
 
+def process_price(raw_price):
+    try:
+        price = Decimal(raw_price)
+        price = price.quantize(Decimal('0.01'), rounding=ROUND_DOWN)
+
+        if len(str(price)) > 10:
+            raise ValueError("Price too large")
+
+        return price
+    except (InvalidOperation, ValueError):
+        raise ValueError("Invalid start price")
 
 @app.route('/', methods=['GET', 'POST'])
 def root():
@@ -88,16 +100,19 @@ def root():
 @app.route('/place-bid/<int:list_id>', methods=['POST'])
 def place_bid(list_id):
         data = request.get_json()
-        bid_amt = int(data['bid'])
+        user_id = data['userID']
+        bid_amt = process_price(data['bidAmt'])
         bid_date = datetime.date.today()
         db_conn = db.connect_to_database()
 
+        # Check if the current bid highest
         query = "SELECT l.listingID, l.bidID, l.startPrice as startPrice, b.bidAmt as amount FROM Listings l LEFT JOIN Bids b ON l.bidID = b.bidID WHERE l.listingID = %s;"
         high_bid = db.execute_query(db_connection=db_conn, query=query,
                                     query_params=(list_id,)).fetchone()
 
         valid_bid, message = validate_bid(bid_amt, high_bid)
 
+        # Find the email of the seller 
         query = """
         SELECT u.email as email
         From Users u LEFT JOIN Listings l ON u.userID = l.userID
@@ -106,6 +121,7 @@ def place_bid(list_id):
         sellerEmail = db.execute_query(db_connection=db_conn, query=query,
                                     query_params=(list_id,)).fetchone()
         
+        # Find current highest buyer email
         query = """
         SELECT u.email as email
         From Users u LEFT JOIN Bids b ON u.userID = b.userID
@@ -121,7 +137,7 @@ def place_bid(list_id):
         else:
             query = "INSERT INTO Bids (userID, listingID, bidAmt, bidDate) VALUES (%s, %s, %s, %s)"
             cursor = db.execute_query(db_connection=db_conn, query=query,
-                                      query_params=(g.user['userID'], list_id,
+                                      query_params=(user_id, list_id,
                                                     bid_amt, bid_date))
             bid_id = cursor.lastrowid
 
