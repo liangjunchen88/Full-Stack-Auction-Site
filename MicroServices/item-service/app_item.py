@@ -243,7 +243,7 @@ def submit_listing():
         startDate = request.form['startDate']
         endDate = request.form['endDate']
         startPrice = process_price(request.form['startPrice'])
-        buyNowPrice = process_price(request.form['byNowPrice'])
+        buyNowPrice = process_price(request.form['buyNowPrice'])
         description = request.form['description']
         quantity = request.form['quantity']
         shippingCosts = process_price(request.form['shippingCosts'])

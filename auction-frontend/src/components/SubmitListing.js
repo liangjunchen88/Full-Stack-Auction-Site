@@ -12,6 +12,7 @@ import config from "../config";
         shippingCosts: '',
         expiration: '',
         startDate: '',
+        buyNowPrice:'',
         photo: null
     });
 
@@ -34,6 +35,7 @@ import config from "../config";
         form.append('name', formData.name);
         form.append('description', formData.description);
         form.append('startPrice', formData.startPrice);
+        form.append('buyNowPrice', formData.buyNowPrice);
         form.append('quantity', formData.quantity);
         form.append('shippingCosts', formData.shippingCosts);
         form.append('endDate', formData.expiration);
@@ -60,6 +62,7 @@ import config from "../config";
                 shippingCosts: '',
                 expiration: '',
                 startDate: '',
+                buyNowPrice:'',
                 photo: null
             })
         }
@@ -96,8 +99,8 @@ import config from "../config";
                 </div>
                 <div className="row mt-2">
                     <div className="col-4">
-                        <label htmlFor="byNowPrice" className="form-label">Enter a buy-now price amount:<strong style={{ color: 'red' }}>*</strong></label>
-                        <input type="number" className="form-control" id="byNowPrice" name="byNowPrice" value={formData.byNowPrice} onChange={handleChange} />
+                        <label htmlFor="buyNowPrice" className="form-label">Enter a buy-now price amount:<strong style={{ color: 'red' }}>*</strong></label>
+                        <input type="number" className="form-control" id="buyNowPrice" name="buyNowPrice" value={formData.buyNowPrice} onChange={handleChange} />
                     </div>
                 </div>
                 <div className="row mt-2">
