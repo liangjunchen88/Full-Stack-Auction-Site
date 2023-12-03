@@ -9,6 +9,9 @@ import threading
 # from datetime import datetime
 import datetime
 import time
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils.utils import send_notification, send_alert, write_log
 
 # Set up upload folder
 UPLOAD_FOLDER = 'static/img/'
@@ -94,6 +97,24 @@ def place_bid(list_id):
                                     query_params=(list_id,)).fetchone()
 
         valid_bid, message = validate_bid(bid_amt, high_bid)
+
+        query = """
+        SELECT u.email as email
+        From Users u LEFT JOIN Listings l ON u.userID = l.userID
+        WHERE l.listingID = %s;
+        """
+        sellerEmail = db.execute_query(db_connection=db_conn, query=query,
+                                    query_params=(list_id,)).fetchone()
+        
+        query = """
+        SELECT u.email as email
+        From Users u LEFT JOIN Bids b ON u.userID = b.userID
+        LEFT JOIN Listings l ON b.bidID = l.bidID
+        WHERE l.listingID = %s;
+        """
+        buyerEmail = db.execute_query(db_connection=db_conn, query=query,
+                                    query_params=(list_id,)).fetchone()
+
         if not valid_bid:
             flash(message, 'danger')
             return redirect(url_for('root'))
@@ -107,6 +128,12 @@ def place_bid(list_id):
             query = "UPDATE Listings SET bidID = %s WHERE listingID = %s;"
             db.execute_query(db_connection=db_conn, query=query,
                             query_params=(bid_id, list_id))
+            
+            # send alerts to seller and former buyer
+            if sellerEmail:
+                send_alert(sellerEmail['email'], "Someone has placed a bid on your listing.")
+            if buyerEmail:
+                send_alert(buyerEmail['email'], "Someone has placed a higher bid than you!")
 
             flash(message, 'success')
             return redirect(url_for('root'))
@@ -114,5 +141,5 @@ def place_bid(list_id):
 
 # Listener
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 9112))
+    port = int(os.environ.get('PORT', 9113))
     app.run(port=port, debug=True)
