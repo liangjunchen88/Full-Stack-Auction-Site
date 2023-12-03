@@ -21,6 +21,29 @@ function Profile({ user }) {
   const [bidHistory, setBidHistory] = useState([]);
   const [userInfo, setUserInfo] = useState([]);
   const [activeUsers, setActiveUsers] = useState([]);
+  const [watchlist, setWatchlist] = useState([]);
+
+  const [lowerPrice, setLowerPrice] = useState('');
+  const [upperPrice, setUpperPrice] = useState('');
+  const [keyword, setKeyword] = useState('');
+
+  const handleSubmit = () => {
+    const data = {
+      'userID':user.id,
+      'keyword':keyword,
+      'lowerPrice':lowerPrice,
+      'upperPrice':upperPrice
+    };
+
+    axios.post('http://localhost:9991/add-watchlist', data)
+        .then(response => {
+          alert('Watchlist created successfully!');
+        })
+        .catch(error => {
+          alert('Error creating watchlist: ' + error.message);
+        });
+  };
+
 
   useEffect(() => {
     if (!user || !user.id) return;
@@ -59,6 +82,12 @@ function Profile({ user }) {
     axios.post(`${config.itemServiceUrl}/get-shoppingcart`, { 'userID': user.id })
         .then((response) => {
           setShoppingCart(response.data.data);
+        })
+        .catch((error) => console.log(error));
+
+    axios.post(`${config.itemServiceUrl}/get-watchlist`, { 'userID': user.id })
+        .then((response) => {
+          setWatchlist(response.data.data);
         })
         .catch((error) => console.log(error));
   }, [user, user.id]);
@@ -292,7 +321,56 @@ function Profile({ user }) {
               ))}
               </tbody>
             </table>
+
+
+            <h4 style={{ color: "maroon" }}>Watchlist</h4>
+            <table className="table table-striped table-hover">
+              <thead>
+              <tr>
+                <th>#</th>
+                <th>Lower Price</th>
+                <th>Upper Price</th>
+                <th>Keywords</th>
+              </tr>
+              </thead>
+              <tbody>
+              {watchlist.map((listing, index) => (
+                  <tr key={listing.watchlistID}>
+                    <th>{index + 1}</th>
+                    <td>{listing.lowerPrice}</td>
+                    <td>{listing.upperPrice}</td>
+                    <td>{listing.keyword}</td>
+                  </tr>
+              ))}
+              </tbody>
+            </table>
+
+            <div>
+              <input
+                  type="text"
+                  placeholder="Lower Price"
+                  value={lowerPrice}
+                  onChange={e => setLowerPrice(e.target.value)}
+              />
+              <input
+                  type="text"
+                  placeholder="Upper Price"
+                  value={upperPrice}
+                  onChange={e => setUpperPrice(e.target.value)}
+              />
+              <input
+                  type="text"
+                  placeholder="Keyword"
+                  value={keyword}
+                  onChange={e => setKeyword(e.target.value)}
+              />
+              <button onClick={handleSubmit}>Create Watchlist</button>
+            </div>
+
           </div>
+
+
+
       )}
     </div>
   );
