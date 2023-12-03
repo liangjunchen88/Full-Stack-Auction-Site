@@ -9,6 +9,9 @@ from werkzeug.utils import secure_filename
 import json
 import os
 from database import db_connector as db
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils.utils import send_notification, send_alert, write_log
 
 # Set up upload folder
 UPLOAD_FOLDER = 'static/img/'
@@ -282,17 +285,9 @@ def submit_listing():
         """
 
         email_listing = db.execute_query(db_connection=db_conn, query=query, query_params=(startPrice, name)).fetchall()
-        notify_url = "http://localhost:9993/notice"
-        headers = {"Content-Type": "application/json"}
         for email_dict in email_listing:
             msg = "We found an item you might be interested in: {}".format(name)
-            data = {"msg": msg, "receiver": email_dict['email']}
-            response = requests.post(notify_url, headers=headers, json=data)
-            if response.status_code == 200:
-                print("notification sent successful!")
-                print("Response content:", response.content.decode())
-            else:
-                print("notification failed with status code:", response.status_code)
+            send_notification(email_dict['email'], msg)
 
         return jsonify({'success': True, 'listingID': list_id}), 200
 
