@@ -248,7 +248,7 @@ def submit_listing():
         quantity = request.form['quantity']
         shippingCosts = process_price(request.form['shippingCosts'])
         numFlagged = 0
-        status = "active"
+        status = "inactive"
 
         if 'file' in request.files:
             photo = request.files['file']
@@ -406,6 +406,12 @@ def terminate_listing():
     if request.method == 'POST':
         data = request.json
         listingID = data['listingID']
+        query = "SELECT bidID FROM Listings WHERE listingID = %s"
+        result = db.execute_query(
+            db_connection=db_conn, query=query, query_params=listingID).fetchone()
+        bidID = result['bidID']
+        if bidID:
+            return jsonify({'success': False, 'message': "listing has bid"}), 400
         query = "UPDATE Listings SET status = 'inactive' WHERE listingID = %s"
         db.execute_query(
             db_connection=db_conn, query=query, query_params=listingID)

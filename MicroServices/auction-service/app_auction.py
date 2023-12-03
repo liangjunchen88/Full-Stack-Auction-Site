@@ -13,6 +13,7 @@ import time
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.utils import send_notification, send_alert, write_log
+import requests
 
 # Set up upload folder
 UPLOAD_FOLDER = 'static/img/'
@@ -39,11 +40,28 @@ def update_listing_status():
 
         # Update listings to 'hold' if current time is greater than or equal to endDate
         update_query = """
-        UPDATE Listings 
-        SET status = 'hold' 
-        WHERE endDate <= %s AND status != 'hold';
+        SELECT listingID 
+        from Listings 
+        WHERE endDate <= %s AND status = 'active';
         """
-        db.execute_query(db_connection=db_conn, query=update_query, query_params=(current_time,))
+        ended_listings = db.execute_query(db_connection=db_conn, query=update_query, query_params=(current_time,)).fetchall()
+        for listing in ended_listings:
+            listingID = listing['listingID']
+            url = 'http://localhost:9991/end-listing'  # Replace with your target URL
+            data = {
+                'listingID': listingID
+            }
+            headers = {
+                'Content-Type': 'application/json'  # Example header
+            }
+            response = requests.post(url, json=data, headers=headers)
+
+            # To check if the request was successful
+            if response.status_code == 200:
+                print("Success:", response.json())
+            else:
+                print("Error:", response.status_code, response.text)
+
         
         # Update countdown for active listings
         update_query = """

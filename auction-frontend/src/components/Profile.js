@@ -56,12 +56,11 @@ function Profile({ user }) {
       })
       .catch((error) => console.log(error));
 
-    axios
-      .get(`${config.userServiceUrl}/user/${user.id}/shopping-cart`)
-      .then((response) => {
-        setShoppingCart(response.data.data);
-      })
-      .catch((error) => console.log(error));
+    axios.post(`${config.itemServiceUrl}/get-shoppingcart`, { 'userID': user.id })
+        .then((response) => {
+          setShoppingCart(response.data.data);
+        })
+        .catch((error) => console.log(error));
   }, [user, user.id]);
 
   if (!userInfo) {
@@ -167,29 +166,36 @@ function Profile({ user }) {
         <h4 style={{ color: "maroon" }}>Active Listings</h4>
         <table className="table table-striped table-hover">
           <thead>
-            <tr>
-              <th>#</th>
-              <th>Item</th>
-              <th>Current Bid</th>
-              <th>Start Price</th>
-              <th>Expires</th>
-              <th>Actions</th>
-            </tr>
+          <tr>
+            <th>#</th>
+            <th>Item</th>
+            <th>Current Bid</th>
+            <th>Start Price</th>
+            <th>Expires</th>
+            <th>Number Flagged</th>
+            <th>Remove Auction</th>
+            <th>End Auction</th>
+          </tr>
           </thead>
           <tbody>
-            {activeListings.map((listing, index) => (
+          {activeListings.map((listing, index) => (
               <tr key={listing.listingID}>
                 <th>{index + 1}</th>
                 <td>{listing.name}</td>
                 <td>{listing.bidAmt}</td>
                 <td>{listing.startPrice}</td>
                 <td>{new Date(listing.endDate).toLocaleDateString()}</td>
+                <td>{listing.numFlagged}</td>
                 <td>
                   {/* opration button */}
-                  <button className="btn btn-danger">Cancel</button>
+                  <button className="btn btn-danger">Remove</button>
+                </td>
+                <td>
+                  {/* opration button */}
+                  <button className="btn btn-danger">End</button>
                 </td>
               </tr>
-            ))}
+          ))}
           </tbody>
         </table>
       </div>
@@ -243,7 +249,7 @@ function Profile({ user }) {
                 <td>{new Date(user.dateJoined).toLocaleDateString()}</td>
                 <td>
                   {/* operation button */}
-                  <button className="btn btn-danger">Delete</button>
+                  <button className="btn btn-danger">Suspend</button>
                 </td>
               </tr>
             ))}
@@ -253,36 +259,40 @@ function Profile({ user }) {
 
       {/* Shopping Cart Table - Only render for normal users */}
       {!user.isAdmin && (
-        <div className="mt-5">
-          <h4 style={{ color: "maroon" }}>Shopping Cart</h4>
-          <table className="table table-striped table-hover">
-            <thead>
+          <div className="mt-5">
+            <h4 style={{ color: "maroon" }}>Shopping Cart</h4>
+            <table className="table table-striped table-hover">
+              <thead>
               <tr>
                 <th>#</th>
                 <th>Item</th>
-                <th>Current Bid</th>
-                <th>Start Price</th>
-                <th>Expires</th>
+                <th>End Data</th>
+                <th>Deal Price</th>
+                <th>Shipping Costs</th>
+                <th>Quantity</th>
+                <th>Description</th>
                 <th>Actions</th>
               </tr>
-            </thead>
-            <tbody>
+              </thead>
+              <tbody>
               {shoppingCart.map((listing, index) => (
-                <tr key={listing.listingID}>
-                  <th>{index + 1}</th>
-                  <td>{listing.name}</td>
-                  <td>{listing.bidAmt}</td>
-                  <td>{listing.startPrice}</td>
-                  <td>{new Date(listing.endDate).toLocaleDateString()}</td>
-                  <td>
-                    {/* opration button */}
-                    <button className="btn btn-danger">Cancel</button>
-                  </td>
-                </tr>
+                  <tr key={listing.listingID}>
+                    <th>{index + 1}</th>
+                    <td>{listing.name}</td>
+                    <td>{listing.endDate}</td>
+                    <td>{listing.dealPrice}</td>
+                    <td>{listing.shippingCosts}</td>
+                    <td>{listing.quantity}</td>
+                    <td>{listing.description}</td>
+                    <td>
+                      {/* opration button */}
+                      <button className="btn btn-danger">Check Out</button>
+                    </td>
+                  </tr>
               ))}
-            </tbody>
-          </table>
-        </div>
+              </tbody>
+            </table>
+          </div>
       )}
     </div>
   );

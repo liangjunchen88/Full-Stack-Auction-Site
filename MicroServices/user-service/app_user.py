@@ -140,7 +140,7 @@ def login():
     db_conn = db.connect_to_database()
     user = db.execute_query(
         db_conn,
-        'SELECT * FROM Users WHERE userName = %s', (username,)
+        'SELECT * FROM Users WHERE userName = %s AND isActive = TRUE', (username,)
     ).fetchone()
 
     if user and check_password_hash(user['password'], password):
@@ -231,42 +231,6 @@ def get_active_listings(user_id):
 
     return jsonify({'success': True, 'data': processed_listings})
 
-@app.route('/user/<int:user_id>/shopping-cart', methods=['GET'])
-def get_shopping_cart(user_id):
-    # print(f"get_active_listings called with user_id: {user_id}")
-    db_conn = db.connect_to_database()
-
-    listings_query = """
-    SELECT 
-        Listings.*, 
-        Photos.photoPath,
-        Bids.bidAmt
-    FROM 
-        Listings 
-    LEFT JOIN 
-        Photos ON Listings.listingID = Photos.listingID
-    LEFT JOIN 
-        Bids ON Listings.bidID = Bids.bidID
-    WHERE 
-        Listings.userID = %s AND Listings.status = 'hold';
-    """
-    query_params = (user_id,)
-
-    listings = db.execute_query(db_connection=db_conn, query=listings_query, query_params=query_params).fetchall()
-
-    processed_listings = []
-    for listing in listings:
-        processed_listing = {}
-        for key, value in listing.items():
-            if isinstance(value, Decimal):
-                processed_listing[key] = str(value)
-            elif isinstance(value, datetime):
-                processed_listing[key] = value.strftime('%Y-%m-%d %H:%M')
-            else:
-                processed_listing[key] = value
-        processed_listings.append(processed_listing)
-
-    return jsonify({'success': True, 'data': processed_listings})
 
 @app.route('/user/<int:user_id>/active-users', methods=['GET'])
 def get_active_users(user_id):
@@ -278,20 +242,30 @@ def get_active_users(user_id):
     is_admin = db.execute_query(db_connection=db_conn, query=admin_check_query, query_params=(user_id,)).fetchone()
 
     # If the current user is not an admin, return an error response
-    if not (is_admin and is_admin['isAdmin']):
-        return jsonify({'success': False, 'message': 'Access denied'}), 403
+    if is_admin['isAdmin']:
+        users_query = """
+        SELECT 
+            userID, userName, firstName, lastName, email, dateJoined, rating, isActive
+        FROM 
+            Users
+        WHERE 
+            isAdmin = FALSE AND isActive = TRUE;
+        """
 
+        users = db.execute_query(db_connection=db_conn, query=users_query).fetchall()
+        #return jsonify({'success': False, 'message': 'Access denied'}), 403
+    else:
     # If the current user is an admin, fetch all active non-admin users
-    users_query = """
-    SELECT 
-        userID, userName, firstName, lastName, email, dateJoined, rating, isActive
-    FROM 
-        Users
-    WHERE 
-        isAdmin = FALSE AND isActive = TRUE;
-    """
+        users_query = """
+        SELECT 
+            userID, userName, firstName, lastName, email, dateJoined, rating, isActive
+        FROM 
+            Users
+        WHERE 
+            userID = %s;
+        """
 
-    users = db.execute_query(db_connection=db_conn, query=users_query).fetchall()
+        users = db.execute_query(db_connection=db_conn, query=users_query, query_params=user_id).fetchall()
 
     processed_users = []
     for user in users:
