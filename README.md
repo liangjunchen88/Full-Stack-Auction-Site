@@ -13,25 +13,26 @@ Our platform is not just a demonstration of technical skill but a testament to o
 ## __Technology Stack and APIs__
 
 ### Backend
-- **Flask**: A lightweight Python web framework used for creating backend APIs.
-- **Flask-CORS**: An extension for handling cross-origin requests in Flask applications.
-- **Werkzeug**: A comprehensive WSGI web application library, used here for password hashing and secure file handling.
-- **smtplib**: Python's built-in library for sending emails via SMTP.
-- **Gmail SMTP Server**: Utilized as the email server for dispatching notifications and alerts.
-- **Python's datetime Module**: For handling all date and time-related operations.
-- **Python's os Module**: Used for operating system interactions, such as file path management.
-- **Python's decimal Module**: Ensures precise decimal arithmetic, useful for monetary calculations.
-- **Python's json Module**: Essential for parsing and generating JSON data.
-- **Custom Flask APIs**: Developed for various functionalities like user registration, listing management, and more.
-- **Environment Variable Management with os.environ**: For secure and flexible configuration management.
-- **Flask's Development Server**: For local testing and development purposes.
+- **Flask**: Utilized for setting up the server and routing for the backend APIs.
+- **Flask-CORS**: Enabled cross-origin requests, crucial for frontend-backend communication.
+- **Werkzeug**: Employed for secure password hashing and file handling functionalities.
+- **smtplib**: Facilitated the sending of notification and alert emails.
+- **Gmail SMTP Server**: Served as the SMTP server for sending out emails from the application.
+- **Python's datetime Module**: Used for all date and time manipulations, especially in listing and bid management.
+- **Python's os Module**: Handled file path operations and environment variable management.
+- **Python's decimal Module**: Ensured precise handling of monetary values in bidding and pricing.
+- **Python's json Module**: Managed JSON data parsing and generation for API communication.
+- **Custom Flask APIs**: Developed for user registration, listing management, bid handling, and more.
+- **Environment Variable Management with os.environ**: Managed configuration settings securely.
+- **Flask's Development Server**: Used for local development and testing of the application.
 
 ### Frontend
-- **React.js**: (Implied) A frontend library for building user interfaces, commonly used with Flask.
+- **React.js**: (Implied) Powered the user interface, likely used in conjunction with Flask for dynamic content rendering.
 
 ### Database
-- **MySQL**: A relational database management system for storing and managing application data.
-- **MongoDB**: A NoSQL database used for logging and storing non-relational data.
+- **MySQL**: Acted as the primary database for storing user and auction data.
+- **MongoDB**: Used for logging purposes, storing application logs and audit trails.
+
 
 
 ----------------------------------------------------------------------------------
