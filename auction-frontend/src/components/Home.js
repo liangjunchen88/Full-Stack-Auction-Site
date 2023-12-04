@@ -50,6 +50,30 @@ function Listings() {
   const handleBuyNow = () => {
     console.log("Buy Now clicked for item:");
   };
+
+  const handleFlag = (listingID) => {
+    console.log("Flag clicked for item");
+    const url = `${config.itemServiceUrl}/flag-listing`;
+
+    axios
+      .post(
+        url,
+        {
+          listingID: listingID,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
+        console.log("flag successfully", response);
+      })
+      .catch((error) => {
+        console.error("Error flag", error);
+      });
+  };
   useEffect(() => {
     // Fetch all listings
     axios
@@ -183,6 +207,13 @@ function Listings() {
                           onClick={handleBuyNow}
                         >
                           Buy It Now
+                        </button>
+                        <button
+                          className="btn btn-primary"
+                          type="button"
+                          onClick={() => handleFlag(item.listingID)}
+                        >
+                          Flag
                         </button>
                       </div>
                     </div>
