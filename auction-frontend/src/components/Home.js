@@ -218,14 +218,14 @@ function Listings() {
                     <p className="card-subtitle mb-2 text-muted">
                       Ends: {formatDate(item.endDate)}
                     </p>
-                    <p className="card-subtitle mb-2 text-muted">Quantity Left: {item.countDown}</p>
-                    <p className="card-subtitle mb-2 text-muted">Number of Bids: {item.numFlagged}</p>
+                    <p className="card-subtitle mb-2 text-muted">Count Down: {item.countDown} s</p>
+                    <p className="card-subtitle mb-2 text-muted">Number of Flags: {item.numFlagged}</p>
                   </div>
                   <div style={{
                     marginBottom:'3px',
                     marginLeft:'3px',
                   }} className="col">
-                    <div className="badge bg-info " style={{marginRight:'2px'}}>category1</div>
+                    <div className="badge bg-info " style={{marginRight:'2px'}}>{item.categories}</div>
                   </div>
                   <div className="card-footer bg-transparent">
                     <div>
@@ -277,7 +277,6 @@ function Listings() {
                       </div>
                     </div>
                   </div>
-                  {/* 表单和按钮可以根据具体需求添加 */}
                 </div>
               </div>
             ))}

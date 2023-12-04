@@ -365,12 +365,21 @@ function Profile({ user }) {
                   </button>
                 </td>
                 <td>
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => handleEndListing(listing.listingID)}
-                  >
-                    End
-                  </button>
+                  {user.isAdmin ? (
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => handleEndListing(listing.listingID)}
+                    >
+                      End
+                    </button>
+                  ) : (
+                    <button
+                      className="btn btn-danger"
+                      // onClick={() => handleEndListing(listing.listingID)}
+                    >
+                      End
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

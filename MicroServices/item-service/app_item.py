@@ -421,15 +421,22 @@ def terminate_listing():
     if request.method == 'POST':
         data = request.json
         listingID = data['listingID']
+        
+        # Change the endDate to the startDate in case the loop restore the staus to active
+        query = "SELECT startDate FROM Listings WHERE listingID = %s;"
+        result = db.execute_query(
+            db_connection=db_conn, query=query, query_params=(listingID,)).fetchone()
+        startDate = result['startDate']
+        
         query = "SELECT bidID FROM Listings WHERE listingID = %s"
         result = db.execute_query(
             db_connection=db_conn, query=query, query_params=listingID).fetchone()
         bidID = result['bidID']
         if bidID:
             return jsonify({'success': False, 'message': "listing has bid"}), 400
-        query = "UPDATE Listings SET status = 'inactive' WHERE listingID = %s"
+        query = "UPDATE Listings SET status = 'inactive', endDate = %s WHERE listingID = %s"
         db.execute_query(
-            db_connection=db_conn, query=query, query_params=listingID)
+            db_connection=db_conn, query=query, query_params=(startDate, listingID))
         return jsonify({'success': True, 'message': "listing is inactive"}), 200
 
 

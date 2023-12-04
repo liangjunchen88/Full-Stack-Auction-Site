@@ -43,9 +43,11 @@ function Login({ onLogin }) {
                 navigate('/');
             } else {
                 console.error('Login failed:', response);
+                alert('login failed')
             }
         } catch (error) {
             console.error('There was an error during the login process:', error);
+            alert('login failed')
         }
     };
 
