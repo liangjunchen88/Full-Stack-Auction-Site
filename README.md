@@ -27,7 +27,7 @@ Our platform is not just a demonstration of technical skill but a testament to o
 - **Flask's Development Server**: Used for local development and testing of the application.
 
 ### Frontend
-- **React.js**: (Implied) Powered the user interface, likely used in conjunction with Flask for dynamic content rendering.
+- **React.js**: Powered the user interface, used in conjunction with Flask for dynamic content rendering.
 
 ### Database
 - **MySQL**: Acted as the primary database for storing user and auction data.
