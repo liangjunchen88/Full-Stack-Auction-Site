@@ -1,28 +1,26 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import config from "../config";
+import useLocalStorage from "../hooks/useLocalStorage";
 
 function Listings() {
   const [listings, setListings] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
   const [hasResults, setHasResults] = useState(true);
-  // const [bidAmount, setBidAmount] = useState("");
   const [bidAmounts, setBidAmounts] = useState({});
-
-  // const handleBidSubmit = () => {
-  //     console.log('Bid submitted:', bidAmount);
-  // };
+  const [user, _] = useLocalStorage("user", {});
 
   const handleBidSubmit = (listingID) => {
     const bidAmount = bidAmounts[listingID];
-    const url = `${config.backendUrl}/place-bid/${listingID}`;
+    const url = `${config.auctionServiceUrl}/place-bid/${listingID}`;
 
     axios
       .post(
         url,
         {
-          bid: bidAmount,
+          bidAmt: bidAmount,
+          userID: user.id
         },
         {
           headers: {
