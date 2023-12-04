@@ -94,6 +94,8 @@ function Listings() {
                   <p className="card-subtitle mb-2 text-muted">Quantity: {item.quantity}</p>
                   <p className="card-subtitle mb-2 text-muted">Shipping Costs: ${item.shippingCosts}</p>
                   <p className="card-subtitle mb-2 text-muted">Ends: {formatDate(item.endDate)}</p>
+                  <p className="card-subtitle mb-2 text-muted">Quantity Left: {item.countDown}</p>
+                  <p className="card-subtitle mb-2 text-muted">Number of Bids: {item.numFlagged}</p>
                 </div>
                 <div className="card-footer bg-transparent">
             <div>
