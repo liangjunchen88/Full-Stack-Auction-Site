@@ -106,7 +106,7 @@ function Listings() {
                   className="form-control"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search listings by name or description"
+                  placeholder="Search listings by name or category"
                 />
                 <button className="main-button" type="submit">
                   Search
