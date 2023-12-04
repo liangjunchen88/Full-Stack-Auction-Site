@@ -3,13 +3,19 @@ import axios from "axios";
 import config from "../config";
 import useLocalStorage from "../hooks/useLocalStorage";
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function Listings() {
   const [listings, setListings] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
   const [hasResults, setHasResults] = useState(true);
   const [bidAmounts, setBidAmounts] = useState({});
+  const [buyNowPrice, setBuyNowPrice] = useState({});
   const [user, _] = useLocalStorage("user", {});
+  const [activeListings, setActiveListings] = useState([]);
 
   const handleBidSubmit = (listingID) => {
     const bidAmount = bidAmounts[listingID];
@@ -47,8 +53,53 @@ function Listings() {
     }));
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async (listingID) => {
     console.log("Buy Now clicked for item:");
+
+    const bidAmount = 70000;
+    const url = `${config.auctionServiceUrl}/place-bid/${listingID}`;
+
+    axios
+      .post(
+        url,
+        {
+          bidAmt: bidAmount,
+          userID: user.id
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
+        console.log("Bid placed successfully", response);
+        setBidAmounts((prevBidAmounts) => ({
+          ...prevBidAmounts,
+          [listingID]: "",
+        }));
+      })
+      .catch((error) => {
+        console.error("Error placing bid", error);
+      });
+    
+    await delay(500);
+
+    try {
+      const response = await axios.post("http://localhost:9991/end-listing", {
+        listingID,
+      });
+      if (response.data.success) {
+        setActiveListings((currentListings) =>
+          currentListings.filter((listing) => listing.listingID !== listingID)
+        );
+        alert("Buy it now successfully");
+      } else {
+        alert(response.data.message);
+      }
+    } catch (error) {
+      alert("Error ending listing: You cannot end an auction without bid.");
+    }
   };
 
   const handleFlag = (listingID) => {
@@ -204,7 +255,7 @@ function Listings() {
                         <button
                           className="btn btn-primary"
                           type="button"
-                          onClick={handleBuyNow}
+                          onClick={() => handleBuyNow(item.listingID)}
                         >
                           Buy It Now
                         </button>
