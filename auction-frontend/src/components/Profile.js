@@ -23,78 +23,140 @@ function Profile({ user }) {
   const [activeUsers, setActiveUsers] = useState([]);
   const [watchlist, setWatchlist] = useState([]);
 
-  const [lowerPrice, setLowerPrice] = useState('');
-  const [upperPrice, setUpperPrice] = useState('');
-  const [keyword, setKeyword] = useState('');
+  const [lowerPrice, setLowerPrice] = useState("");
+  const [upperPrice, setUpperPrice] = useState("");
+  const [keyword, setKeyword] = useState("");
 
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [dateList, setDateList] = useState([]);
 
-  const [newCategory, setNewCategory] = useState('');
+  const [newCategory, setNewCategory] = useState("");
 
-  const [toLinkListingID, setToLinkListingID] = useState('');
-  const [toLinkCategory, setToLinkCategory] = useState('');
+  const [toLinkListingID, setToLinkListingID] = useState("");
+  const [toLinkCategory, setToLinkCategory] = useState("");
 
+  const handleCheckout = async (listingID) => {
+    try {
+      const response = await axios.post("http://localhost:9991/checkout", {
+        listingID,
+      });
+      if (response.data.success) {
+        // Update your UI here, e.g., remove the listing from shoppingCart
+        setShoppingCart((currentListings) =>
+          currentListings.filter((listing) => listing.listingID !== listingID)
+        );
+        alert("Checkout successful");
+      } else {
+        alert(response.data.message);
+      }
+    } catch (error) {
+      alert("Error during checkout: " + error.message);
+    }
+  };
+
+  const handleRemoveListing = async (listingID) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:9991/terminate-listing",
+        { listingID }
+      );
+      if (response.data.success) {
+        setActiveListings((currentListings) =>
+          currentListings.filter((listing) => listing.listingID !== listingID)
+        );
+        alert("Listing removed successfully");
+      } else {
+        alert(response.data.message);
+      }
+    } catch (error) {
+      alert(
+        "Error removing listing: You cannot remove an item already has been bid."
+      );
+    }
+  };
+
+  const handleEndListing = async (listingID) => {
+    try {
+      const response = await axios.post("http://localhost:9991/end-listing", {
+        listingID,
+      });
+      if (response.data.success) {
+        setActiveListings((currentListings) =>
+          currentListings.filter((listing) => listing.listingID !== listingID)
+        );
+        alert("Listing ended successfully");
+      } else {
+        alert(response.data.message);
+      }
+    } catch (error) {
+      alert("Error ending listing: You cannot end an auction without bid.");
+    }
+  };
 
   const handleCategorizeSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://localhost:9991/categorize-listing', {
-        'listingID':toLinkListingID,
-        'category':toLinkCategory
-      });
-      alert('Listing categorized successfully!');
+      const response = await axios.post(
+        "http://localhost:9991/categorize-listing",
+        {
+          listingID: toLinkListingID,
+          category: toLinkCategory,
+        }
+      );
+      alert("Listing categorized successfully!");
       // Optionally reset the state here if needed
     } catch (error) {
-      alert('Error in categorizing listing: ' + error.message);
+      alert("Error in categorizing listing: " + error.message);
     }
   };
 
   const handleWatchlistSubmit = () => {
     const data = {
-      'userID':user.id,
-      'keyword':keyword,
-      'lowerPrice':lowerPrice,
-      'upperPrice':upperPrice
+      userID: user.id,
+      keyword: keyword,
+      lowerPrice: lowerPrice,
+      upperPrice: upperPrice,
     };
 
-    axios.post('http://localhost:9991/add-watchlist', data)
-        .then(response => {
-          alert('Watchlist created successfully!');
-        })
-        .catch(error => {
-          alert('Error creating watchlist: ' + error.message);
-        });
+    axios
+      .post("http://localhost:9991/add-watchlist", data)
+      .then((response) => {
+        alert("Watchlist created successfully!");
+      })
+      .catch((error) => {
+        alert("Error creating watchlist: " + error.message);
+      });
   };
 
   const handleFilterSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://localhost:9991/search-by-time', {
-        filterStartDate: startDate,
-        filterEndDate: endDate
-      });
+      const response = await axios.post(
+        "http://localhost:9991/search-by-time",
+        {
+          filterStartDate: startDate,
+          filterEndDate: endDate,
+        }
+      );
       setDateList(response.data.data);
     } catch (error) {
-      alert('Error fetching the list: ' + error.message);
+      alert("Error fetching the list: " + error.message);
     }
   };
 
   const handleNewCategorySubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://localhost:9991/add-category', {
-        new_category: newCategory
+      const response = await axios.post("http://localhost:9991/add-category", {
+        new_category: newCategory,
       });
-      alert('Category added successfully!');
-      setNewCategory('');
+      alert("Category added successfully!");
+      setNewCategory("");
     } catch (error) {
-      alert('Error adding category: ' + error.message);
+      alert("Error adding category: " + error.message);
     }
   };
-
-
 
   useEffect(() => {
     if (!user || !user.id) return;
@@ -130,17 +192,19 @@ function Profile({ user }) {
       })
       .catch((error) => console.log(error));
 
-    axios.post(`${config.itemServiceUrl}/get-shoppingcart`, { 'userID': user.id })
-        .then((response) => {
-          setShoppingCart(response.data.data);
-        })
-        .catch((error) => console.log(error));
+    axios
+      .post(`${config.itemServiceUrl}/get-shoppingcart`, { userID: user.id })
+      .then((response) => {
+        setShoppingCart(response.data.data);
+      })
+      .catch((error) => console.log(error));
 
-    axios.post(`${config.itemServiceUrl}/get-watchlist`, { 'userID': user.id })
-        .then((response) => {
-          setWatchlist(response.data.data);
-        })
-        .catch((error) => console.log(error));
+    axios
+      .post(`${config.itemServiceUrl}/get-watchlist`, { userID: user.id })
+      .then((response) => {
+        setWatchlist(response.data.data);
+      })
+      .catch((error) => console.log(error));
   }, [user, user.id]);
 
   if (!userInfo) {
@@ -246,20 +310,20 @@ function Profile({ user }) {
         <h4 style={{ color: "maroon" }}>Active Listings</h4>
         <table className="table table-striped table-hover">
           <thead>
-          <tr>
-            <th>#</th>
-            <th>Listing ID</th>
-            <th>Item</th>
-            <th>Current Bid</th>
-            <th>Start Price</th>
-            <th>Expires</th>
-            <th>Number Flagged</th>
-            <th>Remove Auction</th>
-            <th>End Auction</th>
-          </tr>
+            <tr>
+              <th>#</th>
+              <th>Listing ID</th>
+              <th>Item</th>
+              <th>Current Bid</th>
+              <th>Start Price</th>
+              <th>Expires</th>
+              <th>Number Flagged</th>
+              <th>Remove Auction</th>
+              <th>End Auction</th>
+            </tr>
           </thead>
           <tbody>
-          {activeListings.map((listing, index) => (
+            {activeListings.map((listing, index) => (
               <tr key={listing.listingID}>
                 <th>{index + 1}</th>
                 <td>{listing.listingID}</td>
@@ -269,63 +333,73 @@ function Profile({ user }) {
                 <td>{new Date(listing.endDate).toLocaleDateString()}</td>
                 <td>{listing.numFlagged}</td>
                 <td>
-                  {/* opration button */}
-                  <button className="btn btn-danger">Remove</button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleRemoveListing(listing.listingID)}
+                  >
+                    Remove
+                  </button>
                 </td>
                 <td>
-                  {/* opration button */}
-                  <button className="btn btn-danger">End</button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleEndListing(listing.listingID)}
+                  >
+                    End
+                  </button>
                 </td>
               </tr>
-          ))}
+            ))}
           </tbody>
         </table>
       </div>
 
       <div>
-        <h4 style={{ color: "maroon" }}>Categorize a Listing (Use existing category and listingID</h4>
+        <h4 style={{ color: "maroon" }}>
+          Categorize a Listing (Use existing category and listingID
+        </h4>
         <form onSubmit={handleCategorizeSubmit}>
           <input
-              type="text"
-              placeholder="Listing ID"
-              value={toLinkListingID}
-              onChange={(e) => setToLinkListingID(e.target.value)}
+            type="text"
+            placeholder="Listing ID"
+            value={toLinkListingID}
+            onChange={(e) => setToLinkListingID(e.target.value)}
           />
           <input
-              type="text"
-              placeholder="Category"
-              value={toLinkCategory}
-              onChange={(e) => setToLinkCategory(e.target.value)}
+            type="text"
+            placeholder="Category"
+            value={toLinkCategory}
+            onChange={(e) => setToLinkCategory(e.target.value)}
           />
           <button type="submit">Categorize</button>
         </form>
       </div>
 
       {user.isAdmin && (
-          <div className="mt-5">
-            <h4 style={{ color: "maroon" }}>Closed Listings</h4>
-            <form onSubmit={handleFilterSubmit}>
-              <label>
-                End date from:
-                <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                />
-              </label>
-              <label>
-                to:
-                <input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                />
-              </label>
-              <button type="submit">Search</button>
-            </form>
+        <div className="mt-5">
+          <h4 style={{ color: "maroon" }}>Closed Listings</h4>
+          <form onSubmit={handleFilterSubmit}>
+            <label>
+              End date from:
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+            </label>
+            <label>
+              to:
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </label>
+            <button type="submit">Search</button>
+          </form>
 
-            <table className="table table-striped table-hover">
-              <thead>
+          <table className="table table-striped table-hover">
+            <thead>
               <tr>
                 <th>#</th>
                 <th>Name</th>
@@ -336,35 +410,34 @@ function Profile({ user }) {
                 <th>NUmber of Flags</th>
                 <th>Status</th>
               </tr>
-              </thead>
-              <tbody>
+            </thead>
+            <tbody>
               {dateList.map((listing, index) => (
-                  <tr key={listing.listingID}>
-                    <th>{index + 1}</th>
-                    <td>{listing.name}</td>
-                    <td>{listing.bidAmt}</td>
-                    <td>{listing.startPrice}</td>
-                    <td>{listing.endDate}</td>
-                    <td>{listing.shippingCosts}</td>
-                    <td>{listing.numFlagged}</td>
-                    <td>{listing.status}</td>
-                  </tr>
+                <tr key={listing.listingID}>
+                  <th>{index + 1}</th>
+                  <td>{listing.name}</td>
+                  <td>{listing.bidAmt}</td>
+                  <td>{listing.startPrice}</td>
+                  <td>{listing.endDate}</td>
+                  <td>{listing.shippingCosts}</td>
+                  <td>{listing.numFlagged}</td>
+                  <td>{listing.status}</td>
+                </tr>
               ))}
-              </tbody>
-            </table>
+            </tbody>
+          </table>
 
-            <h4 style={{ color: "maroon" }}>Create New Category</h4>
-            <form onSubmit={handleNewCategorySubmit}>
-              <input
-                  type="text"
-                  placeholder="Enter category name"
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-              />
-              <button type="submit">Create</button>
-            </form>
-
-          </div>
+          <h4 style={{ color: "maroon" }}>Create New Category</h4>
+          <form onSubmit={handleNewCategorySubmit}>
+            <input
+              type="text"
+              placeholder="Enter category name"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+            />
+            <button type="submit">Create</button>
+          </form>
+        </div>
       )}
 
       {/* Bid history Table - Only render for normal users */}
@@ -389,7 +462,6 @@ function Profile({ user }) {
               ))}
             </tbody>
           </table>
-
         </div>
       )}
 
@@ -427,10 +499,10 @@ function Profile({ user }) {
 
       {/* Shopping Cart Table - Only render for normal users */}
       {!user.isAdmin && (
-          <div className="mt-5">
-            <h4 style={{ color: "maroon" }}>Shopping Cart</h4>
-            <table className="table table-striped table-hover">
-              <thead>
+        <div className="mt-5">
+          <h4 style={{ color: "maroon" }}>Shopping Cart</h4>
+          <table className="table table-striped table-hover">
+            <thead>
               <tr>
                 <th>#</th>
                 <th>Item</th>
@@ -441,75 +513,74 @@ function Profile({ user }) {
                 <th>Description</th>
                 <th>Actions</th>
               </tr>
-              </thead>
-              <tbody>
+            </thead>
+            <tbody>
               {shoppingCart.map((listing, index) => (
-                  <tr key={listing.listingID}>
-                    <th>{index + 1}</th>
-                    <td>{listing.name}</td>
-                    <td>{listing.endDate}</td>
-                    <td>{listing.dealPrice}</td>
-                    <td>{listing.shippingCosts}</td>
-                    <td>{listing.quantity}</td>
-                    <td>{listing.description}</td>
-                    <td>
-                      {/* opration button */}
-                      <button className="btn btn-danger">Check Out</button>
-                    </td>
-                  </tr>
+                <tr key={listing.listingID}>
+                  <th>{index + 1}</th>
+                  <td>{listing.name}</td>
+                  <td>{listing.endDate}</td>
+                  <td>{listing.dealPrice}</td>
+                  <td>{listing.shippingCosts}</td>
+                  <td>{listing.quantity}</td>
+                  <td>{listing.description}</td>
+                  <td>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => handleCheckout(listing.listingID)}
+                    >
+                      Check Out
+                    </button>
+                  </td>
+                </tr>
               ))}
-              </tbody>
-            </table>
+            </tbody>
+          </table>
 
-
-            <h4 style={{ color: "maroon" }}>Watchlist</h4>
-            <table className="table table-striped table-hover">
-              <thead>
+          <h4 style={{ color: "maroon" }}>Watchlist</h4>
+          <table className="table table-striped table-hover">
+            <thead>
               <tr>
                 <th>#</th>
                 <th>Lower Price</th>
                 <th>Upper Price</th>
                 <th>Keywords</th>
               </tr>
-              </thead>
-              <tbody>
+            </thead>
+            <tbody>
               {watchlist.map((listing, index) => (
-                  <tr key={listing.watchlistID}>
-                    <th>{index + 1}</th>
-                    <td>{listing.lowerPrice}</td>
-                    <td>{listing.upperPrice}</td>
-                    <td>{listing.keyword}</td>
-                  </tr>
+                <tr key={listing.watchlistID}>
+                  <th>{index + 1}</th>
+                  <td>{listing.lowerPrice}</td>
+                  <td>{listing.upperPrice}</td>
+                  <td>{listing.keyword}</td>
+                </tr>
               ))}
-              </tbody>
-            </table>
+            </tbody>
+          </table>
 
-            <div>
-              <input
-                  type="text"
-                  placeholder="Lower Price"
-                  value={lowerPrice}
-                  onChange={e => setLowerPrice(e.target.value)}
-              />
-              <input
-                  type="text"
-                  placeholder="Upper Price"
-                  value={upperPrice}
-                  onChange={e => setUpperPrice(e.target.value)}
-              />
-              <input
-                  type="text"
-                  placeholder="Keyword"
-                  value={keyword}
-                  onChange={e => setKeyword(e.target.value)}
-              />
-              <button onClick={handleWatchlistSubmit}>Create Watchlist</button>
-            </div>
-
+          <div>
+            <input
+              type="text"
+              placeholder="Lower Price"
+              value={lowerPrice}
+              onChange={(e) => setLowerPrice(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Upper Price"
+              value={upperPrice}
+              onChange={(e) => setUpperPrice(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Keyword"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+            />
+            <button onClick={handleWatchlistSubmit}>Create Watchlist</button>
           </div>
-
-
-
+        </div>
       )}
     </div>
   );

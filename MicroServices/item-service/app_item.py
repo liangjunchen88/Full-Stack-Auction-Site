@@ -337,9 +337,20 @@ def end_listing():
     if request.method == 'POST':
         data = request.json
         listingID = data['listingID']
-        query = "UPDATE Listings SET status = 'hold' WHERE listingID = %s"
+        
+        # Change the endDate to the startDate in case the loop restore the staus to active
+        query = "SELECT startDate FROM Listings WHERE listingID = %s;"
+        result = db.execute_query(
+            db_connection=db_conn, query=query, query_params=(listingID,)).fetchone()
+        startDate = result['startDate']
+
+        query = "UPDATE Listings SET status = 'hold', endDate = %s WHERE listingID = %s"
         db.execute_query(
-            db_connection=db_conn, query=query, query_params=listingID)
+            db_connection=db_conn, query=query, query_params=(startDate, listingID))
+        
+        # query = "UPDATE Listings SET status = 'hold' WHERE listingID = %s"
+        # db.execute_query(
+        #     db_connection=db_conn, query=query, query_params=listingID)
         query = """
         SELECT
             L.listingID,
