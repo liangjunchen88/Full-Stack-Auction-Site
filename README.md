@@ -10,6 +10,18 @@ We've employed advanced technology, including a dual-database system combining S
 Our platform is not just a demonstration of technical skill but a testament to our commitment to creating a user-friendly, dynamic online auction environment.
 
 ----------------------------------------------------------------------------------
+## __Microservices__
+
+There are five mircroservices backend talking and communicating with each other.
+ - **User Microservice**: Manages user accounts, authentication, and profiles.
+ - **Item Microservice**: Handles item listings, updates, and categorization.
+ - **Auction Microservice**: Facilitates auction listings, bidding processes, and auction timers.
+ - **Notification Microservice**: Sends out alerts and notifications to users.
+ - **Log Microservice**: Records user activity and saves them in database.
+
+  ![image](https://github.com/liangjunchen88/Topics-of-Software/assets/113968753/d92580f5-30d5-4dee-9bb7-cbd7507dc984)
+
+----------------------------------------------------------------------------------
 ## __Technology Stack and APIs__
 
 ### Backend
