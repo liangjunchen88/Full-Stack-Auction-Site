@@ -19,7 +19,7 @@ There are five mircroservices backend talking and communicating with each other.
  - **Notification Microservice**: Sends out alerts and notifications to users.
  - **Log Microservice**: Records user activity and saves them in database.
 
-  ![image](https://github.com/liangjunchen88/Topics-of-Software/assets/113968753/d92580f5-30d5-4dee-9bb7-cbd7507dc984)
+  ![image](https://github.com/liangjunchen88/Topics-of-Software/assets/113968753/c8b6c8bc-5ac0-4f47-a3f6-eec923d9cc24)
 
 ----------------------------------------------------------------------------------
 ## __Technology Stack and APIs__
