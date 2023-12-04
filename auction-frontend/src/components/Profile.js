@@ -36,6 +36,30 @@ function Profile({ user }) {
   const [toLinkListingID, setToLinkListingID] = useState("");
   const [toLinkCategory, setToLinkCategory] = useState("");
 
+  const handleSuspendUser = async (userID) => {
+    try {
+      const response = await axios.post("http://localhost:9990/suspend-user", {
+        user_id: userID,
+      });
+      if (response.data.success) {
+        // Update your UI here to reflect the suspension
+        setActiveUsers((currentUsers) =>
+          currentUsers.map((user) => {
+            if (user.userID === userID) {
+              return { ...user, isActive: false }; // or simply remove the user from the list
+            }
+            return user;
+          })
+        );
+        alert(`User ${userID} suspended successfully`);
+      } else {
+        alert(response.data.message);
+      }
+    } catch (error) {
+      alert("Error suspending user: " + error.message);
+    }
+  };
+
   const handleCheckout = async (listingID) => {
     try {
       const response = await axios.post("http://localhost:9991/checkout", {
@@ -488,8 +512,13 @@ function Profile({ user }) {
                 <td>{user.lastName}</td>
                 <td>{new Date(user.dateJoined).toLocaleDateString()}</td>
                 <td>
-                  {/* operation button */}
-                  <button className="btn btn-danger">Suspend</button>
+                  {/* Attach the handleSuspendUser function to the onClick event of the button */}
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleSuspendUser(user.userID)}
+                  >
+                    Suspend
+                  </button>
                 </td>
               </tr>
             ))}

@@ -281,6 +281,23 @@ def get_active_users(user_id):
 
     return jsonify({'success': True, 'data': processed_users})
 
+@app.route('/suspend-user', methods=['POST'])
+def suspend_user():
+    db_conn = db.connect_to_database()
+    user_id = request.json['user_id']
+    
+    # Check if the user exists
+    user_check_query = "SELECT * FROM Users WHERE userID = %s"
+    user = db.execute_query(db_connection=db_conn, query=user_check_query, query_params=(user_id,)).fetchone()
+    if not user:
+        return jsonify({'success': False, 'error': 'User not found'}), 404
+
+    # Update the isActive field for the user to False (inactive)
+    suspend_query = "UPDATE Users SET isActive = FALSE WHERE userID = %s"
+    db.execute_query(db_connection=db_conn, query=suspend_query, query_params=(user_id,))
+    
+    return jsonify({'success': True, 'message': f'User {user_id} suspended successfully'}), 200
+
 
 @app.route('/user/<int:user_id>/bid-history', methods=['GET'])
 def get_bid_history(user_id):
