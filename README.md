@@ -10,6 +10,30 @@ We've employed advanced technology, including a dual-database system combining S
 Our platform is not just a demonstration of technical skill but a testament to our commitment to creating a user-friendly, dynamic online auction environment.
 
 ----------------------------------------------------------------------------------
+## Technology Stack and APIs
+
+	### Backend
+	1. **Flask**: A lightweight Python web framework used for creating backend APIs.
+	2. **Flask-CORS**: An extension for handling cross-origin requests in Flask applications.
+	3. **Werkzeug**: A comprehensive WSGI web application library, used here for password hashing and secure file handling.
+	4. **smtplib**: Python's built-in library for sending emails via SMTP.
+	5. **Gmail SMTP Server**: Utilized as the email server for dispatching notifications and alerts.
+	6. **Python's datetime Module**: For handling all date and time-related operations.
+	7. **Python's os Module**: Used for operating system interactions, such as file path management.
+	8. **Python's decimal Module**: Ensures precise decimal arithmetic, useful for monetary calculations.
+	9. **Python's json Module**: Essential for parsing and generating JSON data.
+	10. **Custom Flask APIs**: Developed for various functionalities like user registration, listing management, and more.
+	11. **Environment Variable Management with os.environ**: For secure and flexible configuration management.
+	12. **Flask's Development Server**: For local testing and development purposes.
+	
+	### Frontend
+	1. **React.js**: (Implied) A frontend library for building user interfaces, commonly used with Flask.
+	
+	### Database
+	1. **MySQL**: A relational database management system for storing and managing application data.
+	2. **MongoDB**: A NoSQL database used for logging and storing non-relational data.
+
+----------------------------------------------------------------------------------
 
 ## __Installation__
 
@@ -128,7 +152,7 @@ Our platform is not just a demonstration of technical skill but a testament to o
 	if you meet the any issue with the depencies like this:
 	![image](https://github.com/liangjunchen88/Topics-of-Software/assets/113968753/738615bb-075f-4a6c-bd25-44bfdf296c52)
 
-	You need to manual pip install the dependencies you need, here I provide all the command you may need.
+	You need to manual pip install the dependencies you need, here I provide all the command you may need:
 	
 	```
  	pip install flask
