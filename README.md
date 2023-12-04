@@ -1,6 +1,17 @@
 # Topics-of-Software
 
-Installing Instruction:
+
+## __Introduction__
+
+Welcome to our innovative Auction Site, inspired by eBay and crafted through the diligent efforts of our student team. This platform offers a seamless auction experience with an intuitive front end and a powerful backend. It integrates diverse functionalities such as user account management, item listings, and real-time bidding.
+
+We've employed advanced technology, including a dual-database system combining SQL and NoSQL databases, ensuring robust data management and scalability. The site supports comprehensive user activities, including account creation, item management, and bid processes, alongside a suite of administrative tools for efficient site management.
+
+Our platform is not just a demonstration of technical skill but a testament to our commitment to creating a user-friendly, dynamic online auction environment.
+
+----------------------------------------------------------------------------------
+
+## __Installation__
 
 1. Download and install Node.js
 	https://nodejs.org/en/download/
@@ -127,32 +138,4 @@ Installing Instruction:
 	pip install pymysql
  	```
 
-If you have father qs, plz reach out anytime on our team chat group ^_^
-
--------------------------------------------------------------------------
-
-Process of creating new branch
-
-1. Web App
-   
-	Code -> Main -> View all branches -> New branch
-
-
-2. Terminal
-   
-	git fetch
-
-	git checkout [branchName]
-	
-	make changes...
-
-	git add .
-
-	git commit -m "...."
-
-	git push
-
-
-3. Pull Request
-   
-	-> New pull request
+If you have any questions, plz reach out anytime on our team ^_^
