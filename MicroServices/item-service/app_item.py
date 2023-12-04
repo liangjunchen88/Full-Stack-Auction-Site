@@ -43,19 +43,24 @@ def get_listings():
     # Update the query to join the Listings, Photos, and Bids tables
     query = """
     SELECT 
-        Listings.*, 
-        Photos.photoPath,
-        Bids.bidAmt
+        L.*,
+        MAX(B.bidAmt) AS bidAmt,
+        MAX(P.photoPath) AS photoPath,
+        GROUP_CONCAT(C.label SEPARATOR ', ') AS categories
     FROM 
-        Listings 
+        Listings L
     LEFT JOIN 
-        Photos ON Listings.listingID = Photos.listingID
+        Bids B ON L.bidID = B.bidID
     LEFT JOIN 
-        Bids ON Listings.bidID = Bids.bidID
+        Photos P ON L.listingID = P.listingID
+    LEFT JOIN 
+        ListingCategory LC ON L.listingID = LC.listingID
+    LEFT JOIN 
+        Categories C ON LC.categoryID = C.categoryID
     WHERE 
-        Listings.userID IS NOT NULL AND Listings.status = 'active'
-    ORDER BY Listings.endDate ASC;
-        
+        L.userID IS NOT NULL AND L.status = 'active'
+    GROUP BY 
+        L.listingID;
     """
 
     listings = db.execute_query(db_connection=db_conn, query=query).fetchall()
@@ -121,19 +126,24 @@ def search_listings():
     db_conn = db.connect_to_database()
     query = """
     SELECT 
-        Listings.*, 
-        Photos.photoPath,
-        Bids.bidAmt
+        L.*,
+        MAX(B.bidAmt) AS bidAmt,
+        MAX(P.photoPath) AS photoPath,
+        GROUP_CONCAT(C.label SEPARATOR ', ') AS categories
     FROM 
-        Listings 
+        Listings L
     LEFT JOIN 
-        Photos ON Listings.listingID = Photos.listingID
+        Bids B ON L.bidID = B.bidID
     LEFT JOIN 
-        Bids ON Listings.bidID = Bids.bidID
+        Photos P ON L.listingID = P.listingID
+    LEFT JOIN 
+        ListingCategory LC ON L.listingID = LC.listingID
+    LEFT JOIN 
+        Categories C ON LC.categoryID = C.categoryID
     WHERE 
-        Listings.name LIKE %s AND 
-        Listings.userID IS NOT NULL AND 
-        Listings.status = 'active';
+        L.userID IS NOT NULL AND L.status = 'active' AND L.name LIKE %s 
+    GROUP BY 
+        L.listingID;
     """
     listings = db.execute_query(db_connection=db_conn, query=query, query_params=(f"%{search_query}%",)).fetchall()
     processed_listings = []
