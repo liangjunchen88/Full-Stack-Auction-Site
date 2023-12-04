@@ -13,7 +13,6 @@ function Listings() {
   const [filteredResults, setFilteredResults] = useState([]);
   const [hasResults, setHasResults] = useState(true);
   const [bidAmounts, setBidAmounts] = useState({});
-  const [buyNowPrice, setBuyNowPrice] = useState({});
   const [user, _] = useLocalStorage("user", {});
   const [activeListings, setActiveListings] = useState([]);
 
@@ -56,7 +55,8 @@ function Listings() {
   const handleBuyNow = async (listingID) => {
     console.log("Buy Now clicked for item:");
 
-    const bidAmount = 70000;
+    const listing = listings.find(item => item.listingID === listingID);
+    const bidAmount = listing.buyNowPrice;
     const url = `${config.auctionServiceUrl}/place-bid/${listingID}`;
 
     axios
