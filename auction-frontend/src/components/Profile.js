@@ -31,6 +31,25 @@ function Profile({ user }) {
   const [endDate, setEndDate] = useState('');
   const [dateList, setDateList] = useState([]);
 
+  const [newCategory, setNewCategory] = useState('');
+
+  const [toLinkListingID, setToLinkListingID] = useState('');
+  const [toLinkCategory, setToLinkCategory] = useState('');
+
+
+  const handleCategorizeSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:9991/categorize-listing', {
+        'listingID':toLinkListingID,
+        'category':toLinkCategory
+      });
+      alert('Listing categorized successfully!');
+      // Optionally reset the state here if needed
+    } catch (error) {
+      alert('Error in categorizing listing: ' + error.message);
+    }
+  };
 
   const handleWatchlistSubmit = () => {
     const data = {
@@ -61,6 +80,20 @@ function Profile({ user }) {
       alert('Error fetching the list: ' + error.message);
     }
   };
+
+  const handleNewCategorySubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:9991/add-category', {
+        new_category: newCategory
+      });
+      alert('Category added successfully!');
+      setNewCategory('');
+    } catch (error) {
+      alert('Error adding category: ' + error.message);
+    }
+  };
+
 
 
   useEffect(() => {
@@ -215,6 +248,7 @@ function Profile({ user }) {
           <thead>
           <tr>
             <th>#</th>
+            <th>Listing ID</th>
             <th>Item</th>
             <th>Current Bid</th>
             <th>Start Price</th>
@@ -228,6 +262,7 @@ function Profile({ user }) {
           {activeListings.map((listing, index) => (
               <tr key={listing.listingID}>
                 <th>{index + 1}</th>
+                <td>{listing.listingID}</td>
                 <td>{listing.name}</td>
                 <td>{listing.bidAmt}</td>
                 <td>{listing.startPrice}</td>
@@ -247,8 +282,28 @@ function Profile({ user }) {
         </table>
       </div>
 
+      <div>
+        <h4 style={{ color: "maroon" }}>Categorize a Listing (Use existing category and listingID</h4>
+        <form onSubmit={handleCategorizeSubmit}>
+          <input
+              type="text"
+              placeholder="Listing ID"
+              value={toLinkListingID}
+              onChange={(e) => setToLinkListingID(e.target.value)}
+          />
+          <input
+              type="text"
+              placeholder="Category"
+              value={toLinkCategory}
+              onChange={(e) => setToLinkCategory(e.target.value)}
+          />
+          <button type="submit">Categorize</button>
+        </form>
+      </div>
+
       {user.isAdmin && (
           <div className="mt-5">
+            <h4 style={{ color: "maroon" }}>Closed Listings</h4>
             <form onSubmit={handleFilterSubmit}>
               <label>
                 End date from:
@@ -269,7 +324,6 @@ function Profile({ user }) {
               <button type="submit">Search</button>
             </form>
 
-            <h4 style={{ color: "maroon" }}>Closed Listings</h4>
             <table className="table table-striped table-hover">
               <thead>
               <tr>
@@ -298,6 +352,18 @@ function Profile({ user }) {
               ))}
               </tbody>
             </table>
+
+            <h4 style={{ color: "maroon" }}>Create New Category</h4>
+            <form onSubmit={handleNewCategorySubmit}>
+              <input
+                  type="text"
+                  placeholder="Enter category name"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+              />
+              <button type="submit">Create</button>
+            </form>
+
           </div>
       )}
 
@@ -323,6 +389,7 @@ function Profile({ user }) {
               ))}
             </tbody>
           </table>
+
         </div>
       )}
 
