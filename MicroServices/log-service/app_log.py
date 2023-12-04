@@ -21,11 +21,11 @@ def log():
     """
     Log message to MongoDB log
     """
-    username = request.json['username']
+    message = request.json['msg']
 
     entry = {}
     entry['timestamp'] = datetime.datetime.utcnow()
-    entry['username'] = username
+    entry['msg'] = message
     log_collection.insert_one(entry)
     return jsonify({'success': True})
 

@@ -94,8 +94,10 @@ Installing Instruction:
 	split into 5 terminals
 	```
 	python .\MicroServices\auction-service\app_auction.py
-	python .\MicroServices\item-service\app_item.py
-	python .\MicroServices\rating-service\app_rating.py
+	cd .\MicroServices\item-service\
+	python app_item.py
+	python .\MicroServices\log-service\app_log.py
+	python .\MicroServices\notification-service\app_notification.py
 	python .\MicroServices\user-service\app_user.py
 
 	cd .\auction-frontend\

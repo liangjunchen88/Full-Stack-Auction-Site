@@ -24,7 +24,7 @@ def execute_query(db_connection=None, query=None, query_params=()):
         print("query is empty! Please pass a SQL query in query")
         return None
 
-    print("Executing %s with %s" % (query, query_params))
+    # print("Executing %s with %s" % (query, query_params))
 
     cursor = db_connection.cursor(pymysql.cursors.DictCursor)
     cursor.execute(query, query_params)

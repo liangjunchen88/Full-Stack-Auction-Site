@@ -1,4 +1,6 @@
 import uuid
+
+import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from decimal import Decimal, InvalidOperation, ROUND_DOWN
@@ -7,6 +9,9 @@ from werkzeug.utils import secure_filename
 import json
 import os
 from database import db_connector as db
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils.utils import send_notification, send_alert, write_log
 
 # Set up upload folder
 UPLOAD_FOLDER = 'static/img/'
@@ -38,6 +43,49 @@ def get_listings():
     # Update the query to join the Listings, Photos, and Bids tables
     query = """
     SELECT 
+        L.*,
+        MAX(B.bidAmt) AS bidAmt,
+        MAX(P.photoPath) AS photoPath,
+        GROUP_CONCAT(C.label SEPARATOR ',') AS categories
+    FROM 
+        Listings L
+    LEFT JOIN 
+        Bids B ON L.bidID = B.bidID
+    LEFT JOIN 
+        Photos P ON L.listingID = P.listingID
+    LEFT JOIN 
+        ListingCategory LC ON L.listingID = LC.listingID
+    LEFT JOIN 
+        Categories C ON LC.categoryID = C.categoryID
+    WHERE 
+        L.userID IS NOT NULL AND L.status = 'active'
+    GROUP BY 
+        L.listingID;
+    """
+
+    listings = db.execute_query(db_connection=db_conn, query=query).fetchall()
+    processed_listings = []
+    for listing in listings:
+        processed_listing = {}
+        for key, value in listing.items():
+            if isinstance(value, Decimal):
+                processed_listing[key] = str(value)
+            elif isinstance(value, datetime):
+                processed_listing[key] = value.strftime('%Y-%m-%d %H:%M')
+            else:
+                processed_listing[key] = value
+        processed_listings.append(processed_listing)
+
+    return jsonify({'success': True, 'data': processed_listings})
+
+
+@app.route('/flagged-listings', methods=['GET'])
+def get_flagged_listings():
+    db_conn = db.connect_to_database()
+
+    # Update the query to join the Listings, Photos, and Bids tables
+    query = """
+    SELECT 
         Listings.*, 
         Photos.photoPath,
         Bids.bidAmt
@@ -48,7 +96,7 @@ def get_listings():
     LEFT JOIN 
         Bids ON Listings.bidID = Bids.bidID
     WHERE 
-        Listings.userID IS NOT NULL AND Listings.status = 'active'
+        Listings.userID IS NOT NULL AND Listings.status = 'active' AND Listings.numFlagged > 0
     ORDER BY Listings.endDate ASC;
         
     """
@@ -72,24 +120,26 @@ def get_listings():
 
 
 # Route for searching listings
-@app.route('/search', methods=['GET'])
+@app.route('/search', methods=['POST'])
 def search_listings():
     search_query = request.json['searchquery']
     db_conn = db.connect_to_database()
     query = """
-    SELECT 
-        Listings.*, 
-        Photos.photoPath
-    FROM 
-        Listings 
-    LEFT JOIN 
-        Photos ON Listings.listingID = Photos.listingID
-    WHERE 
-        Listings.name LIKE %s AND 
-        Listings.userID IS NOT NULL AND 
-        Listings.status = 'active';
+    SELECT
+       L.*,
+       MAX(B.bidAmt) AS bidAmt,
+       MAX(P.photoPath) AS photoPath,
+       GROUP_CONCAT(C.label SEPARATOR ',') AS categories
+    FROM Listings L
+    LEFT JOIN Bids B ON L.bidID = B.bidID
+    LEFT JOIN Photos P ON L.listingID = P.listingID
+    LEFT JOIN ListingCategory LC ON L.listingID = LC.listingID
+    LEFT JOIN Categories C ON LC.categoryID = C.categoryID
+    WHERE L.userID IS NOT NULL AND L.status = 'active' 
+    GROUP BY L.listingID
+    HAVING L.name LIKE %s OR FIND_IN_SET(%s, GROUP_CONCAT(C.label)) > 0;
     """
-    listings = db.execute_query(db_connection=db_conn, query=query, query_params=(f"%{search_query}%",)).fetchall()
+    listings = db.execute_query(db_connection=db_conn, query=query, query_params=(f"%{search_query}%",search_query)).fetchall()
     processed_listings = []
     for listing in listings:
         processed_listing = {}
@@ -103,7 +153,45 @@ def search_listings():
         processed_listings.append(processed_listing)
     return jsonify({'success': True, 'data': processed_listings})
 
-@app.route('/search-by-category', methods=['GET'])
+
+@app.route('/search-by-time', methods=['POST'])
+def search_by_time():
+    filterStartDate = request.json['filterStartDate']
+    filterEndDate = request.json['filterEndDate']
+    db_conn = db.connect_to_database()
+    query = """
+    SELECT 
+        Listings.*, 
+        Photos.photoPath,
+        Bids.bidAmt
+    FROM 
+        Listings 
+    LEFT JOIN 
+        Photos ON Listings.listingID = Photos.listingID
+    LEFT JOIN 
+        Bids ON Listings.bidID = Bids.bidID
+    WHERE 
+        Listings.userID IS NOT NULL AND 
+        Listings.status != 'active' AND
+        Listings.endDate BETWEEN %s AND %s;
+    """
+    listings = db.execute_query(db_connection=db_conn, query=query,
+                                query_params=(filterStartDate, filterEndDate)).fetchall()
+    processed_listings = []
+    for listing in listings:
+        processed_listing = {}
+        for key, value in listing.items():
+            if isinstance(value, Decimal):
+                processed_listing[key] = str(value)
+            elif isinstance(value, datetime):
+                processed_listing[key] = value.strftime('%Y-%m-%d %H:%M')
+            else:
+                processed_listing[key] = value
+        processed_listings.append(processed_listing)
+    return jsonify({'success': True, 'data': processed_listings})
+
+
+@app.route('/search-by-category', methods=['POST'])
 def search_by_category():
     category = request.json['category']
 
@@ -117,13 +205,16 @@ def search_by_category():
     SELECT 
         L.*,
         P.photoPath,
-        LC.categoryID
+        LC.categoryID,
+        B.bidAmt
     FROM 
         Listings L
     JOIN 
         ListingCategory LC ON L.listingID = LC.listingID
     LEFT JOIN 
         Photos P ON L.listingID = P.listingID
+    LEFT JOIN 
+        Bids B ON L.bidID = B.bidID
     WHERE 
         L.userID IS NOT NULL
         AND L.status = 'active'
@@ -156,12 +247,12 @@ def submit_listing():
         startDate = request.form['startDate']
         endDate = request.form['endDate']
         startPrice = process_price(request.form['startPrice'])
-        buyNowPrice = 0
+        buyNowPrice = process_price(request.form['buyNowPrice'])
         description = request.form['description']
         quantity = request.form['quantity']
         shippingCosts = process_price(request.form['shippingCosts'])
         numFlagged = 0
-        status = "active"
+        status = "inactive"
 
         if 'file' in request.files:
             photo = request.files['file']
@@ -170,7 +261,7 @@ def submit_listing():
 
         filepath = "./static/img/No_image_available.jpg"
         # generate the unique filename
-        
+
         if photo and photo.filename != '':
 
             filepath = os.path.join("./"+app.config['UPLOAD_FOLDER'],str(uuid.uuid4())+'.jpg')
@@ -187,6 +278,24 @@ def submit_listing():
         query = "INSERT INTO Photos (photoPath, listingID) VALUES (%s, %s);"
         db.execute_query(db_connection=db_conn, query=query,
                          query_params=(filepath, list_id))
+
+        # notify users who might be interested in this newly added item
+        query = """
+            SELECT
+                DISTINCT u.email
+            FROM
+                 Users u
+            JOIN
+                Watchlists w ON u.userID = w.userID
+            WHERE
+                %s BETWEEN w.lowerPrice AND w.upperPrice
+                AND %s LIKE CONCAT('%%', w.keyword, '%%');
+        """
+
+        email_listing = db.execute_query(db_connection=db_conn, query=query, query_params=(startPrice, name)).fetchall()
+        for email_dict in email_listing:
+            msg = "We found an item you might be interested in: {}".format(name)
+            send_notification(email_dict['email'], msg)
 
         return jsonify({'success': True, 'listingID': list_id}), 200
 
@@ -228,9 +337,20 @@ def end_listing():
     if request.method == 'POST':
         data = request.json
         listingID = data['listingID']
-        query = "UPDATE Listings SET status = 'hold' WHERE listingID = %s"
+        
+        # Change the endDate to the startDate in case the loop restore the staus to active
+        query = "SELECT startDate FROM Listings WHERE listingID = %s;"
+        result = db.execute_query(
+            db_connection=db_conn, query=query, query_params=(listingID,)).fetchone()
+        startDate = result['startDate']
+
+        query = "UPDATE Listings SET status = 'hold', endDate = %s WHERE listingID = %s"
         db.execute_query(
-            db_connection=db_conn, query=query, query_params=listingID)
+            db_connection=db_conn, query=query, query_params=(startDate, listingID))
+        
+        # query = "UPDATE Listings SET status = 'hold' WHERE listingID = %s"
+        # db.execute_query(
+        #     db_connection=db_conn, query=query, query_params=listingID)
         query = """
         SELECT
             L.listingID,
@@ -258,7 +378,8 @@ def end_listing():
               " has been created.")
         return jsonify({'success': True, 'message': "shopping cart created"}), 200
 
-@app.route('/get-shoppingcart', methods=['GET'])
+
+@app.route('/get-shoppingcart', methods=['POST'])
 def get_shoppingcart():
     userID = request.json['userID']
     db_conn = db.connect_to_database()
@@ -300,6 +421,12 @@ def terminate_listing():
     if request.method == 'POST':
         data = request.json
         listingID = data['listingID']
+        query = "SELECT bidID FROM Listings WHERE listingID = %s"
+        result = db.execute_query(
+            db_connection=db_conn, query=query, query_params=listingID).fetchone()
+        bidID = result['bidID']
+        if bidID:
+            return jsonify({'success': False, 'message': "listing has bid"}), 400
         query = "UPDATE Listings SET status = 'inactive' WHERE listingID = %s"
         db.execute_query(
             db_connection=db_conn, query=query, query_params=listingID)
@@ -320,6 +447,7 @@ def checkout_listing():
             db_connection=db_conn, query=query, query_params=listingID)
         return jsonify({'success': True, 'message': "listing is paid and removed from shopping cart"}), 200
 
+
 @app.route('/flag-listing', methods=['POST'])
 def flag_listing():
     db_conn = db.connect_to_database()
@@ -330,6 +458,7 @@ def flag_listing():
         db.execute_query(
             db_connection=db_conn, query=query, query_params=listingID)
         return jsonify({'success': True, 'message': "listing is flagged as counterfeit"}), 200
+
 
 @app.route('/add-category', methods=['POST'])
 def add_category():
@@ -346,6 +475,31 @@ def add_category():
 
         return jsonify({'success': True, 'category_id': category_id}), 200
 
+
+@app.route('/remove-category', methods=['POST'])
+def remove_category():
+    db_conn = db.connect_to_database()
+
+    if request.method == 'POST':
+        data = request.json
+        category = data['category']
+
+        query = "SELECT categoryID FROM Categories WHERE label = %s"
+        result = db.execute_query(
+            db_connection=db_conn, query=query, query_params=category).fetchone()
+        category_id = result['categoryID']
+
+        query = "DELETE FROM ListingCategory WHERE categoryID = %s;"
+        db.execute_query(
+            db_connection=db_conn, query=query, query_params=category_id)
+
+        query = "DELETE FROM Categories WHERE categoryID = %s;"
+        db.execute_query(
+            db_connection=db_conn, query=query, query_params=category_id)
+
+        return jsonify({'success': True, 'message': "category has been removed"}), 200
+
+
 @app.route('/categorize-listing', methods=['POST'])
 def categorize_listing():
     db_conn = db.connect_to_database()
@@ -353,7 +507,7 @@ def categorize_listing():
     if request.method == 'POST':
         data = request.json
         listingID = data['listingID']
-        category= data['category']
+        category = data['category']
 
         query = "SELECT categoryID FROM Categories WHERE label = %s;"
         result = db.execute_query(
@@ -361,11 +515,11 @@ def categorize_listing():
         category_id = result['categoryID']
         query = "INSERT INTO ListingCategory (listingID, categoryID) VALUES (%s, %s);"
         db.execute_query(
-            db_connection=db_conn, query=query, query_params=(listingID,category_id))
+            db_connection=db_conn, query=query, query_params=(listingID, category_id))
 
         return jsonify({'success': True, 'message': "your item has been categorized"}), 200
 
-# TODO: Build whatchList frontEnd
+
 @app.route('/add-watchlist', methods=['POST'])
 def add_watchlist():
     db_conn = db.connect_to_database()
@@ -379,11 +533,12 @@ def add_watchlist():
 
         query = "INSERT INTO Watchlists (userID, lowerPrice, upperPrice, keyword) VALUES (%s, %s, %s, %s);"
         db.execute_query(
-            db_connection=db_conn, query=query, query_params=(userID,lowerPrice,upperPrice,keyword))
+            db_connection=db_conn, query=query, query_params=(userID, lowerPrice, upperPrice, keyword))
 
         return jsonify({'success': True, 'message': "a watchlist has been created"}), 200
 
-@app.route('/get-watchlist', methods=['GET'])
+
+@app.route('/get-watchlist', methods=['POST'])
 def get_watchlist():
     userID = request.json['userID']
     db_conn = db.connect_to_database()
@@ -403,9 +558,6 @@ def get_watchlist():
                 processed_listing[key] = value
         processed_listings.append(processed_listing)
     return jsonify({'success': True, 'data': processed_listings}), 200
-
-
-
 
 
 # Run listener
