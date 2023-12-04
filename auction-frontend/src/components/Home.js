@@ -221,6 +221,12 @@ function Listings() {
                     <p className="card-subtitle mb-2 text-muted">Quantity Left: {item.countDown}</p>
                     <p className="card-subtitle mb-2 text-muted">Number of Bids: {item.numFlagged}</p>
                   </div>
+                  <div style={{
+                    marginBottom:'3px',
+                    marginLeft:'3px',
+                  }} className="col">
+                    <div className="badge bg-info " style={{marginRight:'2px'}}>category1</div>
+                  </div>
                   <div className="card-footer bg-transparent">
                     <div>
                       <span>
