@@ -47,6 +47,7 @@ There are five mircroservices backend talking and communicating with each other.
 ### Database
 - **MySQL**: Acted as the primary database for storing user and auction data.
 - **MongoDB**: Used for logging purposes, storing application logs and audit trails.
+![image](https://github.com/liangjunchen88/Topics-of-Software/assets/113968753/a80bd056-cc17-4130-bec0-dff52ab67a0f)
 
 
 
