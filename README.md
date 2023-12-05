@@ -6,7 +6,8 @@
 Welcome to our innovative Auction Site, inspired by eBay and crafted through the diligent efforts of our student team. This platform offers a seamless auction experience with an intuitive front end and a powerful backend. It integrates diverse functionalities such as user account management, item listings, and real-time bidding.
 
 We've employed advanced technology, including a dual-database system combining SQL and NoSQL databases, ensuring robust data management and scalability. The site supports comprehensive user activities, including account creation, item management, and bid processes, alongside a suite of administrative tools for efficient site management.
-  ![image](https://github.com/liangjunchen88/Topics-of-Software/assets/113968753/6405e15d-65a2-4ca0-b12c-8c7327b4a620)
+  
+  [![Test & Demo](https://github.com/liangjunchen88/Topics-of-Software/assets/113968753/6405e15d-65a2-4ca0-b12c-8c7327b4a620)](https://drive.google.com/file/d/18VchHz8qNI2Xc-j9_0kmkKkE6EhnCj8y/view?usp=drive_link)
 
 Our platform is not just a demonstration of technical skill but a testament to our commitment to creating a user-friendly, dynamic online auction environment.
 
